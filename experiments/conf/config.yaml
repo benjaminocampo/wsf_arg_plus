@@ -22,7 +22,6 @@ input:
   data_path: ???
   data_size: ???
   run_name: ???
-  output_dir: ???
   uri_path: ???
   experiment_name: LLM-check-worthiness
   experiment_description: "We are labeling for check-worthiness using LLMs"
