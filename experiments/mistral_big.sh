@@ -6,7 +6,7 @@
 #SBATCH --mem=320G
 #SBATCH --output=./out/mixtral-8x22B-big-checkworthy.out
 
-source ./bin/activate
+source ../cs_hs_misinfo_env/bin/activate
 python predict_checkworthy.py \
     llm=mistral_big \
     input.data_path=../data/wsf_annotations_misinformation.csv \

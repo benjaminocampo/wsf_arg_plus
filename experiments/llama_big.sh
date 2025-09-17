@@ -6,7 +6,7 @@
 #SBATCH --mem=256G
 #SBATCH --output=./out/llama-70B-big-checkworthy.out
 
-source ./bin/activate
+source ../cs_hs_misinfo_env/bin/activate
 python predict_checkworthy.py \
     llm=llama_big \
     input.data_path=../data/wsf_annotations_misinformation.csv \
