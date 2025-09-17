@@ -96,3 +96,6 @@ def main(cfg: DictConfig):
         # MLFlow.
         mlflow.log_params(flatten_dict(OmegaConf.to_container(cfg, resolve=False)))
         run_experiment(cfg, run)
+
+if __name__ == "__main__":
+    main()
