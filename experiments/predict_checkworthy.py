@@ -32,19 +32,27 @@ def run_experiment(cfg: DictConfig, run: mlflow.ActiveRun):
     Use LLMs to generate the labels for the Check Worthyness task. That is,
     verify if a message can be considered relevant to be fact-checked.
     """
-    output_dir = Path(cfg.input.output_dir)
-
     logger.info("Command-line Arguments:")
     logger.info(f"Raw command-line arguments: {' '.join(map(shlex.quote, sys.argv))}")
 
-    df = pd.read_parquet(cfg.input.data_path)
+    df = pd.read_csv(cfg.input.data_path)
 
-    llm = LLM(model=cfg.llm.params.model, tensor_parallel_size=cfg.llm.params.tensor_parallel_size)
+    assert 0 <= cfg.input.data_size <= 1
+
+    df = df.head(int(len(df) * cfg.input.data_size))
+
+    llm = LLM(
+        model=cfg.llm.params.model,
+        max_model_len=cfg.llm.params.max_model_len,
+        max_num_batched_tokens=cfg.llm.params.max_num_batched_tokens,
+        tensor_parallel_size=cfg.llm.params.tensor_parallel_size,
+        dtype=cfg.llm.params.dtype
+    )
     guided_decoding_params = GuidedDecodingParams(choice=cfg.prompt.output_labels)
     sampling_params = SamplingParams(
         guided_decoding=guided_decoding_params,
         max_tokens=cfg.llm.params.max_tokens,
-        #temperature=cfg.llm.params.temperature,
+        # temperature=cfg.llm.params.temperature,
     )
 
     logger.info("generate labels...")
@@ -57,15 +65,17 @@ def run_experiment(cfg: DictConfig, run: mlflow.ActiveRun):
                 {"role": "user", "content": cfg.prompt.user.format(input_text=t)},
             ]
         )
-
-        outputs = llm.chat(
-            prompts=df[f"{col}_prompt_check_worthy"].tolist(),
+        responses = llm.chat(
+            messages=df[f"{col}_prompt_check_worthy"].tolist(),
             sampling_params=sampling_params,
         )
-        df[f"{col}_gen_check_worthy"] = outputs
+        df[f"{col}_gen_check_worthy"] = [r.outputs[0].text for r in responses]
 
-    df.to_csv(output_dir / f"{cfg.llm.name}_check_worthy_gens.csv", index=False)
-    mlflow.log_artifact(output_dir)
+
+    out_file = f"{cfg.llm.name}_check_worthy_gens.csv" 
+    df.to_csv(out_file, index=False)
+    mlflow.log_artifact(out_file)
+    os.remove(out_file)
 
 
 @hydra.main(config_path="conf", config_name="config", version_base=None)
@@ -96,6 +106,7 @@ def main(cfg: DictConfig):
         # MLFlow.
         mlflow.log_params(flatten_dict(OmegaConf.to_container(cfg, resolve=False)))
         run_experiment(cfg, run)
+
 
 if __name__ == "__main__":
     main()
