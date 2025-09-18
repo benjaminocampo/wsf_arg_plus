@@ -25,5 +25,5 @@ params:
   max_tokens: 4096
   max_model_len: 16384
   max_num_batched_tokens: 16384
-  dtype: float32   # vllm interally often runs with fp16 however xgrammar is not updated to support fp16.
+  dtype: float32   # vllm internally often runs with fp16 however xgrammar is not updated to support fp16.
   tensor_parallel_size: 1
