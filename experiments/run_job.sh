@@ -47,7 +47,8 @@ cat <<EOF > "$SBATCH_SCRIPT"
 #SBATCH --time=${TIME}
 #SBATCH --gres=${GRES}
 #SBATCH --mem=${MEM}
-#SBATCH --output=./out/${JOB_NAME}.out
+#SBATCH --output=./slurmout/${JOB_NAME}.out
+#SBATCH --err=./surmerr/${JOB_NAME}.err
 
 source ../cs_hs_misinfo_env/bin/activate
 python predict_checkworthy.py \\
