@@ -128,3 +128,7 @@ outputs/
 slurmerr/
 slurmout/
 bash_cmds/
+results/
+
+# MacOS files
+.DS_Store
