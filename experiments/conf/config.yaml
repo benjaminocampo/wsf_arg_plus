@@ -1,6 +1,6 @@
 defaults:
   - _self_
-  - llm: llama_small
+  - llm: mistral-7B-small
 
 prompt:
   system: You are an expert annotator that classifies text based on their check-worthiness. Always follow the definitions exactly.
@@ -19,9 +19,9 @@ prompt:
   output_labels: ["Non-Factual", "Unimportant Factual", "Check-worthy Factual"]
 
 input:
-  data_path: ???
-  data_size: ???
-  run_name: ???
-  uri_path: ???
+  data_path: ../data/wsf_annotations_misinformation.csv
+  data_size: 0.1                   # This parameter is just for testing. Should be equal to 1
+  run_name: mistral-7B-small       # Run name will be the same as the llm name
+  uri_path: ./results              # Results will be saved in the ./results directory
   experiment_name: LLM-check-worthiness
   experiment_description: "We are labeling for check-worthiness using LLMs"
