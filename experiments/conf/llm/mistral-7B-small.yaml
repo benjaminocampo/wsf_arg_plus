@@ -1,8 +1,23 @@
+# JOB STATISTICS
+# ==============
+# Job ID: 14780451
+# Cluster: snellius
+# Nodes: 1
+# Cores per node: 16
+# CPU Utilized: 00:02:09
+# CPU Efficiency: 7.01% of 00:30:40 core-walltime
+# Job Wall-clock time: 00:01:55
+# Memory Utilized: 2.39 GB
+# Memory Efficiency: 5.97% of 40.00 GB (40.00 GB/node)
+
+# Comments: 20G of memory would be enough for this model. Also 4hs is not
+# needed, it can be 5 minutes maximum.
+
 slurm_params:
   partition: gpu_h100
   time: 00-04:00:00
   gres: gpu:h100:1
-  mem: 80G
+  mem: 40G
   
 name: mistral-7B-small
 params:
