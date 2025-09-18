@@ -35,11 +35,7 @@ a chosen LLM using parameters defined in the `conf` directory.
 Command-line arguments are managed with
 **[Hydra](https://hydra.cc/docs/intro/)**, a configuration framework. Hydra uses
 `.yaml` files to specify default parameters and organize different experiment
-settings.  
-
----
-
-## Running Experiments  
+settings.
 
 To launch an experiment with a specific LLM configuration, use the
 **`run_job.sh`** script.  
