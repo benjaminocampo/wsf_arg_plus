@@ -52,7 +52,6 @@ def run_experiment(cfg: DictConfig, run: mlflow.ActiveRun):
     sampling_params = SamplingParams(
         guided_decoding=guided_decoding_params,
         max_tokens=cfg.llm.params.max_tokens,
-        # temperature=cfg.llm.params.temperature,
     )
 
     logger.info("generate labels...")
