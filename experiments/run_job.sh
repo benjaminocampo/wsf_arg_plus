@@ -76,5 +76,5 @@ if ! command -v sbatch &>/dev/null; then
   bash "$SBATCH_SCRIPT"
 else
   sbatch "$SBATCH_SCRIPT"
-  echo "Submitted job with config $CONFIG"
+  echo "Submitted job with config $LLM_CONFIG and $PROMPT_CONFIG"
 fi
