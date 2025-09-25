@@ -18,7 +18,7 @@ slurm_params:
   time: 00-00:10:00
   gres: gpu:h100:1
   mem: 20G
-  
+
 name: mistral-7B-small
 params:
   model: mistralai/Mistral-7B-Instruct-v0.3

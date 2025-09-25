@@ -16,6 +16,9 @@ import sys
 import mlflow
 import os
 
+# Default path if user does not override via CLI
+DEFAULT_CONFIG_PATH = "conf/pred_checkworthiness"
+
 load_dotenv()
 
 HF_TOKEN = os.getenv("HF_TOKEN")
@@ -58,26 +61,26 @@ def run_experiment(cfg: DictConfig, run: mlflow.ActiveRun):
 
     arg_cols = ["premise0", "premise1", "premise2", "conclusion"]
     for col in arg_cols:
-        df[f"{col}_prompt_check_worthy"] = df[col].apply(
+        df[f"{col}_llm_pred"] = df[col].apply(
             lambda t: [
                 {"role": "system", "content": cfg.prompt.system},
                 {"role": "user", "content": cfg.prompt.user.format(input_text=t)},
             ]
         )
         responses = llm.chat(
-            messages=df[f"{col}_prompt_check_worthy"].tolist(),
+            messages=df[f"{col}_llm_pred"].tolist(),
             sampling_params=sampling_params,
         )
-        df[f"{col}_gen_check_worthy"] = [r.outputs[0].text for r in responses]
+        df[f"{col}_llm_pred"] = [r.outputs[0].text for r in responses]
 
 
-    out_file = f"{cfg.llm.name}_check_worthy_gens.csv" 
+    out_file = f"{cfg.llm.name}_llm_pred.csv" 
     df.to_csv(out_file, index=False)
     mlflow.log_artifact(out_file)
     os.remove(out_file)
 
 
-@hydra.main(config_path="conf", config_name="config", version_base=None)
+@hydra.main(config_path=DEFAULT_CONFIG_PATH, config_name="config", version_base=None)
 def main(cfg: DictConfig):
     OmegaConf.register_new_resolver("eval", lambda x: eval(x))
 

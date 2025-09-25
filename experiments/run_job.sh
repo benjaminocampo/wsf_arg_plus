@@ -10,7 +10,7 @@ set -euo pipefail
 # Checks that the user passed at least one argument (the YAML config file).
 # Otherwise, prints usage and exits.
 if [ $# -lt 1 ]; then
-  echo "Usage: $0 <llm_config.yaml> <prompt_config.yaml>"
+  echo "Usage: $0 <config_dir> <llm_config.yaml> <prompt_config.yaml>"
   exit 1
 fi
 
@@ -22,8 +22,9 @@ if command -v sbatch &>/dev/null; then
   mkdir -p slurmerr slurmout
 fi
 
-LLM_CONFIG=$1
-PROMPT_CONFIG=$2
+CONFIG_DIR=$1
+LLM_CONFIG=$2
+PROMPT_CONFIG=$3
 
 # Takes config file
 # Small inline Python helper to extract YAML values
@@ -64,7 +65,8 @@ cat <<EOF > "$SBATCH_SCRIPT"
 #SBATCH --error=./slurmerr/${JOB_NAME}.err
 
 source ../cs_hs_misinfo_env/bin/activate
-python predict_checkworthy.py \\
+python predict.py 
+    --config-dir ${CONFIG_DIR} \\
     llm=${LLM_NAME} \\
     prompt=${SHOT_TYPE} \\
     input.run_name=${JOB_NAME}
