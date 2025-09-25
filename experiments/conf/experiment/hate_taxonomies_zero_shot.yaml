@@ -1,3 +1,5 @@
+experiment_name: hate_taxonomies_zero_shot
+experiment_description: "We are labeling for detecting hate taxonomies using LLMs. Models are zero shot."
 shot_type: zero-shot
 system: You are an expert annotator that classifies text based on their type of hate. Always follow the definitions exactly.
 user: |

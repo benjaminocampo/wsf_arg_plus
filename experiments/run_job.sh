@@ -10,7 +10,7 @@ set -euo pipefail
 # Checks that the user passed at least one argument (the YAML config file).
 # Otherwise, prints usage and exits.
 if [ $# -lt 1 ]; then
-  echo "Usage: $0 <config_dir> <llm_config.yaml> <prompt_config.yaml>"
+  echo "Usage: $0 <experiment_config.yaml> <llm_config.yaml>"
   exit 1
 fi
 
@@ -22,9 +22,8 @@ if command -v sbatch &>/dev/null; then
   mkdir -p slurmerr slurmout
 fi
 
-CONFIG_DIR=$1
+EXPERIMENT_CONFIG=$1
 LLM_CONFIG=$2
-PROMPT_CONFIG=$3
 
 # Takes config file
 # Small inline Python helper to extract YAML values
@@ -47,9 +46,9 @@ PARTITION=$(get_yaml "$LLM_CONFIG" "data['slurm_params']['partition']")
 TIME=$(get_yaml "$LLM_CONFIG" "data['slurm_params']['time']")
 GRES=$(get_yaml "$LLM_CONFIG" "data['slurm_params']['gres']")
 MEM=$(get_yaml "$LLM_CONFIG" "data['slurm_params']['mem']")
-SHOT_TYPE=$(get_yaml "$PROMPT_CONFIG" "data['shot_type']")
+EXPERIMENT_NAME=$(get_yaml "$EXPERIMENT_CONFIG" "data['experiment_name']")
 
-JOB_NAME="${LLM_NAME}_${SHOT_TYPE}"
+JOB_NAME="${LLM_NAME}_${EXPERIMENT_NAME}"
 
 # Create sbatch script
 SBATCH_SCRIPT=$(mktemp)
@@ -66,9 +65,8 @@ cat <<EOF > "$SBATCH_SCRIPT"
 
 source ../cs_hs_misinfo_env/bin/activate
 python predict.py 
-    --config-dir ${CONFIG_DIR} \\
     llm=${LLM_NAME} \\
-    prompt=${SHOT_TYPE} \\
+    experiment=${EXPERIMENT_NAME} \\
     input.run_name=${JOB_NAME}
 EOF
 

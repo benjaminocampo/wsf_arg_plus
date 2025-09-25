@@ -16,9 +16,6 @@ import sys
 import mlflow
 import os
 
-# Default path if user does not override via CLI
-DEFAULT_CONFIG_PATH = "conf/pred_checkworthiness"
-
 load_dotenv()
 
 HF_TOKEN = os.getenv("HF_TOKEN")
@@ -49,9 +46,9 @@ def run_experiment(cfg: DictConfig, run: mlflow.ActiveRun):
         max_model_len=cfg.llm.params.max_model_len,
         max_num_batched_tokens=cfg.llm.params.max_num_batched_tokens,
         tensor_parallel_size=cfg.llm.params.tensor_parallel_size,
-        dtype=cfg.llm.params.dtype
+        dtype=cfg.llm.params.dtype,
     )
-    guided_decoding_params = GuidedDecodingParams(choice=cfg.prompt.output_labels)
+    guided_decoding_params = GuidedDecodingParams(choice=cfg.experiment.output_labels)
     sampling_params = SamplingParams(
         guided_decoding=guided_decoding_params,
         max_tokens=cfg.llm.params.max_tokens,
@@ -63,8 +60,8 @@ def run_experiment(cfg: DictConfig, run: mlflow.ActiveRun):
     for col in arg_cols:
         df[f"{col}_llm_pred"] = df[col].apply(
             lambda t: [
-                {"role": "system", "content": cfg.prompt.system},
-                {"role": "user", "content": cfg.prompt.user.format(input_text=t)},
+                {"role": "system", "content": cfg.experiment.system},
+                {"role": "user", "content": cfg.experiment.user.format(input_text=t)},
             ]
         )
         responses = llm.chat(
@@ -73,14 +70,13 @@ def run_experiment(cfg: DictConfig, run: mlflow.ActiveRun):
         )
         df[f"{col}_llm_pred"] = [r.outputs[0].text for r in responses]
 
-
-    out_file = f"{cfg.llm.name}_llm_pred.csv" 
+    out_file = f"{cfg.llm.name}_llm_pred.csv"
     df.to_csv(out_file, index=False)
     mlflow.log_artifact(out_file)
     os.remove(out_file)
 
 
-@hydra.main(config_path=DEFAULT_CONFIG_PATH, config_name="config", version_base=None)
+@hydra.main(config_path="conf", config_name="config", version_base=None)
 def main(cfg: DictConfig):
     OmegaConf.register_new_resolver("eval", lambda x: eval(x))
 
@@ -90,8 +86,10 @@ def main(cfg: DictConfig):
 
     logger.info(f"Current tracking uri: {cfg.input.uri_path}")
 
-    mlflow.set_experiment(cfg.input.experiment_name)
-    mlflow.set_experiment_tag("mlflow.note.content", cfg.input.experiment_description)
+    mlflow.set_experiment(cfg.experiment.experiment_name)
+    mlflow.set_experiment_tag(
+        "mlflow.note.content", cfg.experiment.experiment_description
+    )
 
     with mlflow.start_run(run_name=cfg.input.run_name) as run:
         logger.info("Logging configuration as artifact")
