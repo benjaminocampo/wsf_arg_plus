@@ -70,7 +70,7 @@ def run_experiment(cfg: DictConfig, run: mlflow.ActiveRun):
         )
         df[f"{col}_llm_pred"] = [r.outputs[0].text for r in responses]
 
-    out_file = f"{cfg.llm.name}_llm_pred.csv"
+    out_file = f"{cfg.input.run_name}_llm_pred.csv"
     df.to_csv(out_file, index=False)
     mlflow.log_artifact(out_file)
     os.remove(out_file)
