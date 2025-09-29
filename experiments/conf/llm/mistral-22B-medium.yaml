@@ -4,9 +4,9 @@ slurm_params:
   gres: gpu:h100:1
   mem: 20G
 
-name: qwen2.5-7B-small
+name: mistral-22B-medium
 params:
-  model: Qwen/Qwen2.5-7B-Instruct
+  model: mistralai/Mistral-Small-Instruct-2409
   max_tokens: 4096
   max_model_len: 16384
   max_num_batched_tokens: 16384
