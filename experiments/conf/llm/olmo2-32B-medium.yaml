@@ -4,9 +4,9 @@ slurm_params:
   gres: gpu:h100:1
   mem: 20G
 
-name: mistral-7B-small
+name: olmo2-32B-medium
 params:
-  model: mistralai/Mistral-7B-Instruct-v0.3
+  model: allenai/OLMo-2-0325-32B-Instruct
   max_tokens: 4096
   max_model_len: 16384
   max_num_batched_tokens: 16384

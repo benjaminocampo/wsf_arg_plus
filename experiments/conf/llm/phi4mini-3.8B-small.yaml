@@ -4,9 +4,9 @@ slurm_params:
   gres: gpu:h100:1
   mem: 20G
 
-name: mistral-7B-small
+name: phi4mini-3.8B-small
 params:
-  model: mistralai/Mistral-7B-Instruct-v0.3
+  model: microsoft/Phi-4-mini-instruct
   max_tokens: 4096
   max_model_len: 16384
   max_num_batched_tokens: 16384

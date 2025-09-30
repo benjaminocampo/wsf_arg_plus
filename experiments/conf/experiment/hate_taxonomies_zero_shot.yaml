@@ -1,0 +1,15 @@
+experiment_name: hate_taxonomies_zero_shot
+experiment_description: "We are labeling for detecting hate taxonomies using LLMs. Models are zero shot."
+shot_type: zero-shot
+system: You are an expert annotator that classifies text based on their type of hate. Always follow the definitions exactly.
+user: |
+  Classify the following text into one of these categories:  
+  White Grievance: includes frustration over a minority group's perceived privilege and casting majority groups as the real victims of racism. This language is linked to extremist behavior and support for violence.
+  Incitement to Violence: includes flaunting in-group unity and power or elevating known hate groups and ideologies. Article 20 of the UN International Covenant on Civil and Political Rights states that speech which incites violence shall be prohibited by law.
+  Inferiority Language: implies one group or individual is inferior to another, and it can include dehumanization (denial of a person's humanity), and toxification (language that compares the target with disease, insects, animals), both of which are early warning signs of genocide. Inferiority language is also related to assaults on human dignity, dominance, and declarations of superiority of the in-group. 
+  Irony: refers to the use of sarcasm, humor, and satire to attack or demean a protected class or individual. Irony is not exempt from our hate speech typology, since it is commonly used by modern online hate groups to mask their hatred and extremism.
+  Stereotypes and Misinformation: associate a protected class with negative attributes such as crime, or terrorism as in the rhetorical question, This class also includes misinformation that feeds stereotypes and vice versa, like holocaust denial and other forms of historical negationism.
+  Threatening and Intimidation: convey a speaker's commitment to a target's pain, injury, damage, loss, or violation of rights. While explicitly violent threats are well-recognized in the hate speech literature, here we highlight threats related to implicit violation of rights and freedoms, removal of opportunities, and more subtle forms of intimidation,
+
+  Input text: {input_text}
+output_labels: ["White Grievance", "Incitement to Violence", "Inferiority Language", "Irony", "Stereotypes and Misinformation", "Threatening and Intimidation"]
