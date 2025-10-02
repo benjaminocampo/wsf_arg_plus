@@ -7,6 +7,7 @@ from omegaconf import DictConfig, OmegaConf
 
 from vllm import LLM, SamplingParams
 from vllm.sampling_params import GuidedDecodingParams
+from transformers import pipeline
 
 import hydra
 import logging
@@ -27,20 +28,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def run_experiment(cfg: DictConfig, run: mlflow.ActiveRun):
-    """
-    Use LLMs to generate the labels for the Check Worthyness task. That is,
-    verify if a message can be considered relevant to be fact-checked.
-    """
-    logger.info("Command-line Arguments:")
-    logger.info(f"Raw command-line arguments: {' '.join(map(shlex.quote, sys.argv))}")
-
-    df = pd.read_csv(cfg.input.data_path)
-
-    assert 0 <= cfg.input.data_size <= 1
-
-    df = df.head(int(len(df) * cfg.input.data_size))
-
+def predict_checkworthiness(df, cfg):
     llm = LLM(
         model=cfg.llm.params.model,
         max_model_len=cfg.llm.params.max_model_len,
@@ -68,7 +56,49 @@ def run_experiment(cfg: DictConfig, run: mlflow.ActiveRun):
             messages=df[f"{col}_llm_pred"].tolist(),
             sampling_params=sampling_params,
         )
-        df[f"{col}_llm_pred"] = [r.outputs[0].text for r in responses]
+        subj_labels = df[f"{col}_subj_pred"].tolist()
+        df[f"{col}_llm_pred"] = [
+            r.outputs[0].text if subj_l == "SUBJ" else "Non-Factual"
+            for r, subj_l in zip(responses, subj_labels)
+        ]
+
+    return df
+
+
+def predict_subjectivity(df, cfg):
+    clf = pipeline(
+        "text-classification", model="GroNLP/mdebertav3-subjectivity-english"
+    )
+    arg_cols = ["premise0", "premise1", "premise2", "conclusion"]
+    for col in arg_cols:
+        responses = clf(df[col].tolist())
+        y_pred = [r["label"] for r in responses]
+        y_score = [r["score"] for r in responses]
+        df[f"{col}_subj_pred"] = y_pred
+        df[f"{col}_subj_score"] = y_score
+        df[f"{col}_subj_pred"].replace({"LABEL_0": "OBJ", "LABEL_1": "SUBJ"})
+
+    return df
+
+
+def run_experiment(cfg: DictConfig, run: mlflow.ActiveRun):
+    """
+    Use LLMs to generate the labels for the Check Worthyness task. That is,
+    verify if a message can be considered relevant to be fact-checked.
+    """
+    logger.info("Command-line Arguments:")
+    logger.info(f"Raw command-line arguments: {' '.join(map(shlex.quote, sys.argv))}")
+
+    df = pd.read_csv(cfg.input.data_path)
+
+    assert 0 <= cfg.input.data_size <= 1
+
+    df = df.head(int(len(df) * cfg.input.data_size))
+
+    if cfg.experiment.use_subjectivity:
+        df = predict_subjectivity(df, cfg)
+
+    df = predict_checkworthiness(df, cfg)
 
     out_file = f"{cfg.input.run_name}_llm_pred.csv"
     df.to_csv(out_file, index=False)

@@ -1,0 +1,15 @@
+experiment_name: checkworthiness_one_shot
+experiment_description: "We are labeling for check-worthiness using LLMs. Models are guided with one gold example per label."
+shot_type: one-shot
+system: You are an expert annotator that classifies text based on their check-worthiness. Always follow the definitions exactly.
+user: |
+  Classify the following text into one of these categories:  
+  1. Unimportant Factual: Text that contain factual claims but are not important for fact-checking. The general public would not be interested in verifying them.  
+     - Example: "When I was last time in South Africa, we went to Sun City and saw little black monkey children swimming."
+
+  2. Check-worthy Factual: Text that contain factual claims of public interest. These are the kinds of claims journalists would fact-check.  
+     - Example: "92% of abortion clinics are in black communities."
+
+  Input text: {input_text}
+output_labels: ["Unimportant Factual", "Check-worthy Factual"]
+use_subjectivity: true

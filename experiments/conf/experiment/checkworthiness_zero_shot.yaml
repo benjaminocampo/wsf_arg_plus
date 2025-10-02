@@ -10,3 +10,4 @@ user: |
 
   Input text: {input_text}
 output_labels: ["Non-Factual", "Unimportant Factual", "Check-worthy Factual"]
+use_subjectivity: false
