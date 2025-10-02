@@ -58,7 +58,7 @@ def predict_checkworthiness(df, cfg):
         )
         subj_labels = df[f"{col}_subj_pred"].tolist()
         df[f"{col}_llm_pred"] = [
-            r.outputs[0].text if subj_l == "SUBJ" else "Non-Factual"
+            "Non-Factual" if subj_l == "SUBJ" else r.outputs[0].text
             for r, subj_l in zip(responses, subj_labels)
         ]
 
