@@ -1,4 +1,4 @@
-experiment_name: checkworthiness_zero_shot
+experiment_name: subj_checkworthiness_zero_shot
 experiment_description: "We are labeling for detecting hate taxonomies using LLMs. Models are zero shot."
 shot_type: zero-shot
 system: You are an expert annotator that classifies text based on their check-worthiness. Always follow the definitions exactly.

@@ -1,4 +1,4 @@
-experiment_name: checkworthiness_one_shot
+experiment_name: subj_checkworthiness_one_shot
 experiment_description: "We are labeling for check-worthiness using LLMs. Models are guided with one gold example per label."
 shot_type: one-shot
 system: You are an expert annotator that classifies text based on their check-worthiness. Always follow the definitions exactly.
