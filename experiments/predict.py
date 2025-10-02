@@ -71,12 +71,12 @@ def predict_subjectivity(df, cfg):
     )
     arg_cols = ["premise0", "premise1", "premise2", "conclusion"]
     for col in arg_cols:
-        responses = clf(df[col].tolist())
+        responses = clf(df[col].fillna("").tolist())
         y_pred = [r["label"] for r in responses]
         y_score = [r["score"] for r in responses]
         df[f"{col}_subj_pred"] = y_pred
         df[f"{col}_subj_score"] = y_score
-        df[f"{col}_subj_pred"].replace({"LABEL_0": "OBJ", "LABEL_1": "SUBJ"})
+        df[f"{col}_subj_pred"] = df[f"{col}_subj_pred"].replace({"LABEL_0": "OBJ", "LABEL_1": "SUBJ"})
 
     return df
 
