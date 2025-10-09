@@ -8,7 +8,7 @@ name: olmo2-32B-medium
 params:
   model: allenai/OLMo-2-0325-32B-Instruct
   max_tokens: 4096
-  max_model_len: 16384
-  max_num_batched_tokens: 16384
+  max_model_len: 4096
+  max_num_batched_tokens: 4096
   dtype: auto   # vllm internally often runs with fp16 however xgrammar is not updated to support fp16.
   tensor_parallel_size: 1
