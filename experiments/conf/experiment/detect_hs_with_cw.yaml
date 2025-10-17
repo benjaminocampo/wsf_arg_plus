@@ -16,7 +16,7 @@ user: |
   Input:
   {arg_comps}
 
-schema:
+output_schema:
   type: object
   properties:
     labels:
