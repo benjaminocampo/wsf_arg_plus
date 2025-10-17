@@ -107,8 +107,7 @@ def run_experiment(cfg: DictConfig, run: mlflow.ActiveRun):
     )
     responses = llm.chat(
         messages=df["arg_comps_prompt"].tolist(),
-        sampling_params=sampling_params,
-        response_format={"type": "json_schema", "json_schema": cfg.experiment.output_schema},
+        sampling_params=sampling_params
     )
     df["arg_comps_pred"] = [r.outputs[0].text for r in responses]
 
