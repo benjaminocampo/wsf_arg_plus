@@ -49,8 +49,9 @@ def run_experiment(cfg: DictConfig, run: mlflow.ActiveRun):
         tensor_parallel_size=cfg.llm.params.tensor_parallel_size,
         dtype=cfg.llm.params.dtype,
     )
+    guided_decoding_params = GuidedDecodingParams(json=cfg.experiment.output_schema)
     sampling_params = SamplingParams(
-        response_format={"type": "json_schema", "json_schema": cfg.experiment.output_schema},
+        guided_decoding=guided_decoding_params,
         max_tokens=cfg.llm.params.max_tokens,
     )
 
@@ -107,6 +108,7 @@ def run_experiment(cfg: DictConfig, run: mlflow.ActiveRun):
     responses = llm.chat(
         messages=df["arg_comps_prompt"].tolist(),
         sampling_params=sampling_params,
+        response_format={"type": "json_schema", "json_schema": cfg.experiment.output_schema},
     )
     df["arg_comps_pred"] = [r.outputs[0].text for r in responses]
 
