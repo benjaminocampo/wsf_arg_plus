@@ -1,4 +1,4 @@
-experiment_name: detect_hs_per_arg
+experiment_name: detect_hs_per_args
 experiment_description: "We are labeling for hate speech per argument component"
 use_checkworthiness: false
 system: |
