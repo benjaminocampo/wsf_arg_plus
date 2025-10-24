@@ -9,7 +9,7 @@ user: |
   Given this message. Classify if it is either hateful or not.
 
   Input:
-  {arg_cmps}
+  {arg_comps}
 
 schema:
   type: object

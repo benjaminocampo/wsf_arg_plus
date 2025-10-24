@@ -14,7 +14,7 @@ user: |
   Given the argument components of a text message and the check-worthiness labels. Classify each argument component as either hateful or not. Lastly, on the basis of your argument component predictions, classify if the whole message is hateful or not.
 
   Input:
-  {arg_cmps}
+  {arg_comps}
 
 schema:
   type: object
