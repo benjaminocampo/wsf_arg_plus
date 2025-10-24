@@ -11,7 +11,7 @@ user: |
   - Unimportant Factual: Text that contain factual claims but are not important for fact-checking. The general public would not be interested in verifying them.  
   - Check-worthy Factual: Text that contain factual claims of public interest. These are the kinds of claims journalists would fact-check.
 
-  Given the argument components of a text message and the check-worthiness labels. Classify each argument component as either hateful or not. Lastly, on the basis of your argument component predictions, classify if the whole message is hateful or not.
+  Given the argument components of a text message and the check-worthiness labels. Classify each argument component as either hateful or not. Lastly, on the basis of your argument component predictions, classify if the whole message is hateful or not. The resultant output should therefore contain one label per argument component, plus one additional label for the overall message (i.e., number of argument components + 1).
 
   Input:
   {arg_comps}
@@ -21,7 +21,7 @@ schema:
   properties:
     labels:
       type: array
-      description: One label per argument component, in order, followed by the label of the whole message at the end.
+      description: The resultant output should therefore contain one label per argument component, plus one additional label for the overall message (i.e., number of argument components + 1)
       items:
         type: string
         enum: ["hateful", "not hateful"]

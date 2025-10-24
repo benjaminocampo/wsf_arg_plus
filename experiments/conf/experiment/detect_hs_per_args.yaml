@@ -6,7 +6,7 @@ system: |
   Hate speech is considered any kind of content that conveys malevolent intentions toward a group or an individual, and motivated by inherent characteristics that are attributed to that group and shared among its members such as race, color, ethnicity, gender, sexual orientation, nationality, religion, disability, social status, health conditions, or other characteristics.
 
 user: |
-  Given the argument components of a text message. Classify each argument component as either hateful or not. Lastly, on the basis of your argument component predictions, classify if the whole message is hateful or not.
+  Given the argument components of a text message. Classify each argument component as either hateful or not. Lastly, on the basis of your argument component predictions, classify if the whole message is hateful or not. The resultant output should therefore contain one label per argument component, plus one additional label for the overall message (i.e., number of argument components + 1).
 
   Input:
   {arg_comps}
@@ -16,7 +16,7 @@ schema:
   properties:
     labels:
       type: array
-      description: One label per argument component, in order, followed by the label of the whole message at the end.
+      description: The resultant output should therefore contain one label per argument component, plus one additional label for the overall message (i.e., number of argument components + 1)
       items:
         type: string
         enum: ["hateful", "not hateful"]
