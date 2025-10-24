@@ -109,7 +109,7 @@ def run_experiment(cfg: DictConfig, run: mlflow.ActiveRun):
         ]
     )
 
-    responses = []
+    all_responses = []
     for _, row in df.iterrows():
         cfg.experiment.schema.properties.labels.minItems = row["nof_args"] + 1
         cfg.experiment.schema.properties.labels.maxItems = row["nof_args"] + 1
@@ -122,9 +122,9 @@ def run_experiment(cfg: DictConfig, run: mlflow.ActiveRun):
             messages=[row["arg_comps_prompt"]],
             sampling_params=sampling_params
         )
-        responses.extend([r.outputs[0].text for r in responses])
+        all_responses.extend([r.outputs[0].text for r in responses])
         
-    df["arg_comps_pred"] = responses
+    df["arg_comps_pred"] = all_responses
 
     out_file = f"{cfg.input.run_name}_llm_pred.csv"
     df.to_csv(out_file, index=False)
