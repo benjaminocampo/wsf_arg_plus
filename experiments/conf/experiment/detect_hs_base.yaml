@@ -16,7 +16,7 @@ schema:
   properties:
     labels:
       type: array
-      description: One label per argument component, in order.
+      description: Label of the entire message.
       items:
         type: string
         enum: ["hateful", "not hateful"]
