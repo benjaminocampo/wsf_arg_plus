@@ -50,7 +50,7 @@ def run_experiment(cfg: DictConfig, run: mlflow.ActiveRun):
         tensor_parallel_size=cfg.llm.params.tensor_parallel_size,
         dtype=cfg.llm.params.dtype,
     )
-    guided_decoding_params = GuidedDecodingParams(json=json.dumps(cfg.experiment.output_schema))
+    guided_decoding_params = GuidedDecodingParams(json=json.dumps(cfg.experiment.schema))
     sampling_params = SamplingParams(
         guided_decoding=guided_decoding_params,
         max_tokens=cfg.llm.params.max_tokens,
