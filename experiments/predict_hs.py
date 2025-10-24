@@ -50,11 +50,6 @@ def run_experiment(cfg: DictConfig, run: mlflow.ActiveRun):
         tensor_parallel_size=cfg.llm.params.tensor_parallel_size,
         dtype=cfg.llm.params.dtype,
     )
-    guided_decoding_params = GuidedDecodingParams(json=json.dumps(OmegaConf.to_container(cfg.experiment.schema, resolve=True)))
-    sampling_params = SamplingParams(
-        guided_decoding=guided_decoding_params,
-        max_tokens=cfg.llm.params.max_tokens,
-    )
 
     logger.info("generate labels...")
 
@@ -65,6 +60,13 @@ def run_experiment(cfg: DictConfig, run: mlflow.ActiveRun):
     df["premise1_final_cw"] = df["annA_premise1"]
     df["premise2_final_cw"] = df["annA_premise2"]
     df["conclusion_final_cw"] = df["annA_conclusion"]
+
+    df["nof_args"] = (
+        (~df["premise0"].isna()).apply(lambda b: int(b)) +
+        (~df["premise1"].isna()).apply(lambda b: int(b)) +
+        (~df["premise2"].isna()).apply(lambda b: int(b)) +
+        (~df["conclusion"].isna()).apply(lambda b: int(b))
+    )
 
     df.loc[~df["annC_premise0_cw_final"].isna(), "premise0_final_cw"] = df.loc[~df["annC_premise0_cw_final"].isna(), "annC_premise0_cw_final"]
     df.loc[~df["annC_premise1_cw_final"].isna(), "premise1_final_cw"] = df.loc[~df["annC_premise1_cw_final"].isna(), "annC_premise1_cw_final"]
@@ -106,11 +108,23 @@ def run_experiment(cfg: DictConfig, run: mlflow.ActiveRun):
             {"role": "user", "content": cfg.experiment.user.format(arg_comps=t)},
         ]
     )
-    responses = llm.chat(
-        messages=df["arg_comps_prompt"].tolist(),
-        sampling_params=sampling_params
-    )
-    df["arg_comps_pred"] = [r.outputs[0].text for r in responses]
+
+    responses = []
+    for _, row in df.iterrows():
+        cfg.experiment.schema.properties.labels.minItems = row["nof_args"] + 1
+        cfg.experiment.schema.properties.labels.maxItems = row["nof_args"] + 1
+        guided_decoding_params = GuidedDecodingParams(json=json.dumps(OmegaConf.to_container(cfg.experiment.schema, resolve=True)))
+        sampling_params = SamplingParams(
+            guided_decoding=guided_decoding_params,
+            max_tokens=cfg.llm.params.max_tokens,
+        )
+        responses = llm.chat(
+            messages=[row["arg_comps_prompt"]],
+            sampling_params=sampling_params
+        )
+        responses.extend([r.outputs[0].text for r in responses])
+        
+    df["arg_comps_pred"] = responses
 
     out_file = f"{cfg.input.run_name}_llm_pred.csv"
     df.to_csv(out_file, index=False)
