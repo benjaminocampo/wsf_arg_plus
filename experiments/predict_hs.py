@@ -111,9 +111,10 @@ def run_experiment(cfg: DictConfig, run: mlflow.ActiveRun):
 
     all_responses = []
     for _, row in df.iterrows():
-        cfg.experiment.schema.properties.labels.minItems = row["nof_args"] + 1
-        cfg.experiment.schema.properties.labels.maxItems = row["nof_args"] + 1
-        guided_decoding_params = GuidedDecodingParams(json=json.dumps(OmegaConf.to_container(cfg.experiment.schema, resolve=True)))
+        #cfg.experiment.schema.properties.labels.minItems = row["nof_args"] + 1
+        #cfg.experiment.schema.properties.labels.maxItems = row["nof_args"] + 1
+        #guided_decoding_params = GuidedDecodingParams(json=json.dumps(OmegaConf.to_container(cfg.experiment.schema, resolve=True)))
+        guided_decoding_params = GuidedDecodingParams(regex=rf"^(?:hateful|not hateful)(?:,\s*(?:hateful|not hateful)){row['nof_args']}$")
         sampling_params = SamplingParams(
             guided_decoding=guided_decoding_params,
             max_tokens=cfg.llm.params.max_tokens,
