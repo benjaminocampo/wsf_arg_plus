@@ -91,7 +91,7 @@ def run_experiment(cfg: DictConfig, run: mlflow.ActiveRun):
                     else:
                         concat_text += f'Therefore, {row[col].strip(".")}.'
                 else:
-                    if cfg.expertiment.use_checkworthiness:
+                    if cfg.experiment.use_checkworthiness:
                         concat_text += f'[{replacements[row[f"{col}_cw_final"]]}] {row[col].strip(".")} [/{replacements[row[f"{col}_cw_final"]]}]. '
                     else:
                         concat_text += f'{row[col].strip(".")}. '
