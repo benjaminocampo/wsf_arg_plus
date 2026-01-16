@@ -16,7 +16,6 @@ import shlex
 import sys
 import mlflow
 import os
-import math
 
 load_dotenv()
 
@@ -76,7 +75,7 @@ def run_experiment(cfg: DictConfig, run: mlflow.ActiveRun):
     for _, row in df.iterrows():
         concat_text = ""
         for col in cols:
-            if math.isnan(row[c]):
+            if pd.isna(row[c]):
                 continue
             if row["use_claims_only"] == "yes":
                 if row[col].strip(".") == "":
