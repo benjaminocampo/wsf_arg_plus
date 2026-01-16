@@ -16,6 +16,7 @@ import shlex
 import sys
 import mlflow
 import os
+import math
 
 load_dotenv()
 
@@ -66,7 +67,7 @@ def run_experiment(cfg: DictConfig, run: mlflow.ActiveRun):
 
     cols = ["premise0", "premise1", "premise2", "premise3", "premise4", "premise5", "conclusion"]
 
-    df = df.fillna("")
+    #df = df.fillna("")
 
     for c in cols:
         df[f"{c}_cw_final"] = df[[f"{c}_cw_annA", f"{c}_cw_annB", f"{c}_cw_final"]].apply(lambda t: t[f"{c}_cw_annA"] if t[f"{c}_cw_annA"] == t[f"{c}_cw_annB"] else t[f"{c}_cw_final"], axis=1)
@@ -75,6 +76,8 @@ def run_experiment(cfg: DictConfig, run: mlflow.ActiveRun):
     for _, row in df.iterrows():
         concat_text = ""
         for col in cols:
+            if math.isnan(row[c]):
+                continue
             if row["use_claims_only"] == "yes":
                 if row[col].strip(".") == "":
                     continue
@@ -130,7 +133,7 @@ def run_experiment(cfg: DictConfig, run: mlflow.ActiveRun):
         "p_weighted": p_weighted,
         "r_weighted": r_weighted,
         "f1_weighted": f1_weighted,
-        "support_weighted": support_weighted,
+        "support_weighted": support_weighted
     }
     mlflow.log_metrics(results)
     out_file = f"{cfg.input.run_name}_llm_pred.csv"
