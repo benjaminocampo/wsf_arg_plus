@@ -9,7 +9,7 @@ user: |
   Given this message. Classify if it is either hateful or not.
 
   Input:
-  {arg_comps}
+  {input_text}
 
 output_labels: ["hateful", "non-hateful"]
 # schema:
