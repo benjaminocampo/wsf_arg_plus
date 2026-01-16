@@ -111,7 +111,7 @@ def run_experiment(cfg: DictConfig, run: mlflow.ActiveRun):
     )
     df["concat_pred_hate"] = [r.outputs[0].text for r in responses]
 
-    df["concat_pred_hate"].replace({"hateful": 1, "non-hateful": 0})
+    df["concat_pred_hate"] = df["concat_pred_hate"].replace({"hateful": 1, "non-hateful": 0})
     y_true = df["concat_hate"].astype(int)
     y_pred = df["concat_pred_hate"].astype(int)
     p_macro, r_macro, f1_macro, support_macro = precision_recall_fscore_support(y_true, y_pred, average='macro')
