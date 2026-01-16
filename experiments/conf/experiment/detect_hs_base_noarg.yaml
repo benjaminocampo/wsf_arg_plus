@@ -1,4 +1,4 @@
-experiment_name: detect_hs_base
+experiment_name: detect_hs_base_noarg
 experiment_description: "We are labeling the entire HS"
 use_checkworthiness: false
 system: |
