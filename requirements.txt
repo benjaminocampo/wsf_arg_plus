@@ -6,3 +6,4 @@ mlflow
 hydra-core
 vllm
 python-dotenv
+scipy

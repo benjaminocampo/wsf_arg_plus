@@ -1,0 +1,27 @@
+experiment_name: detect_hs_base
+experiment_description: "We are labeling the entire HS"
+use_checkworthiness: false
+system: |
+  You are an expert model for detecting hate speech in text messages based on the following definition of hate speech:
+  Hate speech is considered any kind of content that conveys malevolent intentions toward a group or an individual, and motivated by inherent characteristics that are attributed to that group and shared among its members such as race, color, ethnicity, gender, sexual orientation, nationality, religion, disability, social status, health conditions, or other characteristics.
+
+user: |
+  Given this message. Classify if it is either hateful or not.
+
+  Input:
+  {arg_comps}
+
+output_labels: ["hateful", "non-hateful"]
+# schema:
+#   type: object
+#   properties:
+#     labels:
+#       type: array
+#       description: Label of the entire message.
+#       items:
+#         type: string
+#         enum: ["hateful", "not hateful"]
+#       minItems: 1
+#       maxItems: 1
+#   required:
+#     - labels
