@@ -10,15 +10,6 @@ load_dotenv()
 HF_TOKEN = os.getenv("HF_TOKEN")
 login(HF_TOKEN)
 
-
-slurm_params = {      
-  "partition": "gpu_h100",
-  "time": "00-00:40:00",
-  "gres": "gpu:h100:1",
-  "mem": "20G"
-}
-
-
 system = "You are an expert annotator that classifies text based on their check-worthiness. Always follow the definitions exactly."
 user = """
 Classify the following text into one of these categories:  
