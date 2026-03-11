@@ -66,8 +66,6 @@ def run_experiment(cfg: DictConfig, run: mlflow.ActiveRun):
 
     cols = ["premise0", "premise1", "premise2", "premise3", "premise4", "premise5", "conclusion"]
 
-    #df = df.fillna("")
-
     for c in cols:
         df[f"{c}_cw_final"] = df[[f"{c}_cw_annA", f"{c}_cw_annB", f"{c}_cw_final"]].apply(lambda t: t[f"{c}_cw_annA"] if t[f"{c}_cw_annA"] == t[f"{c}_cw_annB"] else t[f"{c}_cw_final"], axis=1)
 
