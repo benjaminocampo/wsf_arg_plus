@@ -1,0 +1,31 @@
+experiment_name: detect_hs_with_cw_noarg
+experiment_description: "We are labeling the entire HS"
+use_checkworthiness: true
+system: |
+  You are an expert model for detecting hate speech in text messages based on the following definition of hate speech:
+  Hate speech is considered any kind of content that conveys malevolent intentions toward a group or an individual, and motivated by inherent characteristics that are attributed to that group and shared among its members such as race, color, ethnicity, gender, sexual orientation, nationality, religion, disability, social status, health conditions, or other characteristics.
+
+user: |
+  Components in the message are labeled with its check-worthiness information based on these categories:
+    - Non-Factual: Subjective text such as opinions, beliefs, declarations, or wishes. Many questions also fall into this category. These sentences do not contain any factual claim.  
+    - Unimportant Factual: Text that contain factual claims but are not important for fact-checking. The general public would not be interested in verifying them.  
+    - Check-worthy Factual: Text that contain factual claims of public interest. These are the kinds of claims journalists would fact-check.
+  Given this message and its check-worthiness labels. Classify if it is either hateful or not.
+
+  Input:
+  {input_text}
+
+output_labels: ["hateful", "non-hateful"]
+# schema:
+#   type: object
+#   properties:
+#     labels:
+#       type: array
+#       description: Label of the entire message.
+#       items:
+#         type: string
+#         enum: ["hateful", "not hateful"]
+#       minItems: 1
+#       maxItems: 1
+#   required:
+#     - labels

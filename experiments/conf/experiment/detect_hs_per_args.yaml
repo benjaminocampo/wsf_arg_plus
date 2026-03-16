@@ -1,0 +1,26 @@
+experiment_name: detect_hs_per_args
+experiment_description: "We are labeling for hate speech per argument component"
+use_checkworthiness: false
+system: |
+  You are an expert model for detecting hate speech in argumentative text messages based on the following definition of hate speech:
+  Hate speech is considered any kind of content that conveys malevolent intentions toward a group or an individual, and motivated by inherent characteristics that are attributed to that group and shared among its members such as race, color, ethnicity, gender, sexual orientation, nationality, religion, disability, social status, health conditions, or other characteristics.
+
+user: |
+  Given the argument components of a text message. Classify each argument component as either hateful or not. Lastly, on the basis of your argument component predictions, classify if the whole message is hateful or not. The resultant output should therefore contain one label per argument component, plus one additional label for the overall message (i.e., number of argument components + 1).
+
+  Input:
+  {arg_comps}
+
+schema:
+  type: object
+  properties:
+    labels:
+      type: array
+      description: The resultant output should therefore contain one label per argument component, plus one additional label for the overall message (i.e., number of argument components + 1)
+      items:
+        type: string
+        enum: ["hateful", "not hateful"]
+      minItems: 2
+      maxItems: 5
+  required:
+    - labels
