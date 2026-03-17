@@ -1,4 +1,4 @@
-claim_idx,claim,concat_hate,claim_hate,claim_cw_llm_loop,claim_cw_gold,claim_needed_judge_llm_loop,claim_needed_judge_gold,claim_agreement_count_gold,claim_agreement_count_llm_loop
+claim_idx,claim,concat_hate,claim_hate,claim_cw_gold,claim_cw_platinum,claim_needed_judge_gold,claim_needed_judge_platinum,claim_agreement_count_platinum,claim_agreement_count_gold
 0_premise0,The kind of perversion that leads to homosexuality also leads to pedophilia.,1,1.0,CFS,CFS,0.0,0.0,3.0,2.0
 1_premise0,The Jews believe they are The Chosen Ones.,1,0.0,CFS,CFS,0.0,1.0,1.0,2.0
 2_premise0,she seems to think the Blacks wo n't kill her alongside every other White they can get their dirty hands on.,1,1.0,NFS,NFS,1.0,0.0,2.0,1.0
