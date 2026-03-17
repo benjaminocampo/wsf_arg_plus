@@ -111,7 +111,7 @@ In this format, each row corresponds to an entire message, which can be either h
 - Annotations per claim (hatefulness and check-worthiness labels)
 - Existing annotations from WSF-ARG
 
-You can find the dataset in the directory `data/`. `wsf_arg_plus_per_message.csv` containing the aggreggated labels through majority voting. It contains both gold (obtained through LLM-in-the-loop) and platinum (obtained through full human annotation) check-worthiness annotations. `wsf_arg_plus_per_message_gold_disagg.csv` and `wsf_arg_plus_per_message_platinum_disagg.csv` contain the annotations disaggregated given by all annotators for both gold and platinum. We also indicate which claims required to be judged.
+You can find the dataset in the directory `data/`. The file `wsf_arg_plus_per_message.csv` contains the aggreggated labels through majority voting. It has both gold (obtained through LLM-in-the-loop) and platinum (obtained through full human annotation) check-worthiness annotations. `wsf_arg_plus_per_message_gold_disagg.csv` and `wsf_arg_plus_per_message_platinum_disagg.csv` contain the annotations disaggregated given by all annotators for both gold and platinum. We also indicate which claims required to be judged.
 
 2. Claim-level format:
 This format transforms the message-level table into one where each row represents a single claim. Each claim may originate from a full message. For each claim, we record:
@@ -123,4 +123,4 @@ This format transforms the message-level table into one where each row represent
 - Annotations from all human annotators
 - Annotations from each model included in our experimental study
 
-You can find the dataset in the directory `data/`. `wsf_arg_plus_per_claim.csv` containing the aggreggated labels through majority voting. It contains both gold (obtained through LLM-in-the-loop) and platinum (obtained through full human annotation) check-worthiness annotations. `wsf_arg_plus_per_claim_gold_disagg.csv` and `wsf_arg_plus_per_claim_platinum_disagg.csv` contain the annotations disaggregated given by all annotators for both gold and platinum. We also indicate which claims required to be judged.
+You can find the dataset in the directory `data/`. The file `wsf_arg_plus_per_claim.csv` contains the aggreggated labels through majority voting. It has both gold (obtained through LLM-in-the-loop) and platinum (obtained through full human annotation) check-worthiness annotations. `wsf_arg_plus_per_claim_gold_disagg.csv` and `wsf_arg_plus_per_claim_platinum_disagg.csv` contain the annotations disaggregated given by all annotators for both gold and platinum. We also indicate which claims required to be judged.
