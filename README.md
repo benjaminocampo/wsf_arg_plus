@@ -100,7 +100,7 @@ There you can visualize the recorded generations of your run and the associated 
 
 # Dataset
 
-The dataset is organized into two tabular formats:
+The dataset is preprocessed from `wsf_arg_plus_raw.csv` using the script in `experiments/analysis/data_preprocessing.py`. We organized the data into two tabular formats:
 
 1. Message-level format:
 In this format, each row corresponds to an entire message, which can be either hate speech or non-hate speech. Each message is divided into one or more claims. If the message is argumentative, its premises and conclusion are explicitly annotated; otherwise, it is stored as one or more claims. Consequently, each row represents a full message, with columns corresponding to the individual claims. Additional information includes:
@@ -111,8 +111,7 @@ In this format, each row corresponds to an entire message, which can be either h
 - Annotations per claim (hatefulness and check-worthiness labels)
 - Existing annotations from WSF-ARG
 
-The following columns are included:
-TODO: Add column structure
+You can find the dataset in the directory `data/`. `wsf_arg_plus_per_message.csv` containing the aggreggated labels through majority voting. It contains both gold (obtained through LLM-in-the-loop) and platinum (obtained through full human annotation) check-worthiness annotations. `wsf_arg_plus_per_message_gold_disagg.csv` and `wsf_arg_plus_per_message_platinum_disagg.csv` contain the annotations disaggregated given by all annotators for both gold and platinum. We also indicate which claims required to be judged.
 
 2. Claim-level format:
 This format transforms the message-level table into one where each row represents a single claim. Each claim may originate from a full message. For each claim, we record:
@@ -124,9 +123,4 @@ This format transforms the message-level table into one where each row represent
 - Annotations from all human annotators
 - Annotations from each model included in our experimental study
 
-The following columns are included:
-TODO: Add column structure
-
-# Additional scripts
-
-TODO: Add additional scripts
+You can find the dataset in the directory `data/`. `wsf_arg_plus_per_claim.csv` containing the aggreggated labels through majority voting. It contains both gold (obtained through LLM-in-the-loop) and platinum (obtained through full human annotation) check-worthiness annotations. `wsf_arg_plus_per_claim_gold_disagg.csv` and `wsf_arg_plus_per_claim_platinum_disagg.csv` contain the annotations disaggregated given by all annotators for both gold and platinum. We also indicate which claims required to be judged.
