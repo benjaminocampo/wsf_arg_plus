@@ -232,28 +232,39 @@ runs = {
 # %%
 from itertools import chain
 
-df_all_llms = df[["file_id", "idx", "text_ed", "concat_hate"]].copy()
-# Reading new dfs
-runs_df = {}
-for model_name, shot_types in runs.items():
-    runs_df[model_name] = {}
-    for shot in shot_types:
-        runs_df[model_name][shot] = pd.read_csv(f"../../data/raw_generations/check-worthiness/non_hs/{model_name}/{shot}/mj_vot.csv")
-        preds = list(chain.from_iterable([[f"{col}_cw_annB_m0", f"{col}_cw_annB_m1", f"{col}_cw_annB_m2", f"{col}_cw_annB"] for col in cols]))
-        df_all_llms[[f"{model_name}_{shot}_{col_pred}" for col_pred in preds]] = runs_df[model_name][shot][preds]
-        df_all_llms.columns = [col.replace("_annB", "") for col in df_all_llms.columns]
 # %%
-runs_df["Olmo2-32B"]["zero"]
+# Reading new dfs
+df_all_llms = df[["file_id", "idx", "text_ed", "concat_hate"]].copy()
+hs_runs_df = {}
+non_hs_runs_df = {}
+hs_cols = ["premise0", "premise1", "premise2", "conclusion"]
+non_hs_cols = ["premise0", "premise1", "premise2", "premise3", "premise4", "premise5", "conclusion"]
+
+for model_name, shot_types in runs.items():
+    hs_runs_df[model_name] = {}
+    non_hs_runs_df[model_name] = {}
+    for shot in shot_types:
+        hs_runs_df[model_name][shot] = pd.read_csv(f"../../data/raw_generations/check-worthiness/hs/{model_name}/{shot}/mj_vot.csv")
+        non_hs_runs_df[model_name][shot] = pd.read_csv(f"../../data/raw_generations/check-worthiness/non_hs/{model_name}/{shot}/mj_vot.csv")
+
+        hs_preds = list(chain.from_iterable([[f"{col}_cw_annB_m0", f"{col}_cw_annB_m1", f"{col}_cw_annB_m2", f"{col}_cw_annB"] for col in hs_cols]))
+        non_hs_preds = list(chain.from_iterable([[f"{col}_cw_annB_m0", f"{col}_cw_annB_m1", f"{col}_cw_annB_m2", f"{col}_cw_annB"] for col in non_hs_cols]))
+
+        hs_df = hs_runs_df[model_name][shot] # The hs runs have only 227 rows
+        non_hs_df = non_hs_runs_df[model_name][shot][non_hs_runs_df[model_name][shot]["concat_hate"] == 0] # The non-hs side contains the hs part.
+
+        df_all_llms[[f"{model_name}_{shot}_{col_pred}" for col_pred in non_hs_preds]] = pd.concat([hs_df, non_hs_df], axis=0)[non_hs_preds]
+        df_all_llms.columns = [col.replace("_annB", "") for col in df_all_llms.columns]
 # %%
 df_all_llms.to_csv("../../data/wsf_arg_plus_per_message_all_llms.csv", index=False)
 # %%
 # %% [markdown]
 # ## All LLM predictions per claim
-#%%
-# df.loc[:, [f"{k}_{v}_{c}_cw_m0", f"{k}_{v}_{c}_cw_m1", f"{k}_{v}_{c}_cw_m2", f"{k}_{v}_{c}_cw"]]
 # %%
 df_claims_all_llms = pd.read_csv("../../data/wsf_arg_plus_per_claim.csv")
 # %%
+cols = ["premise0", "premise1", "premise2", "premise3", "premise4", "premise5", "conclusion"]
+
 for k, values in runs.items():
     for v in values:
         df_claims_per_llm = [
@@ -266,8 +277,12 @@ for k, values in runs.items():
                     f"{k}_{v}_{c}_cw": f"{k}_{v}_claim_cw"})
             for c in cols]
         df_claims_per_llm = pd.concat(df_claims_per_llm, axis=0)
-        df_claims_per_llm[df_claims_per_llm[f"{k}_{v}_claim_cw"].notna()]
         df_claims_per_llm = df_claims_per_llm.reset_index().rename(columns={"index": "claim_idx"})
+        print(df_claims_per_llm["claim_idx"])
+        df_claims_per_llm = df_claims_per_llm[
+            df_claims_per_llm["claim_idx"].isin(df_claims_all_llms["claim_idx"].tolist())
+        ].reset_index(drop=True)
+        #df_claims_per_llm[df_claims_per_llm[f""].notna()]
         df_claims_all_llms[[f"{k}_{v}_claim_cw_m0", f"{k}_{v}_claim_cw_m1", f"{k}_{v}_claim_cw_m2", f"{k}_{v}_claim_cw"]] = df_claims_per_llm[[f"{k}_{v}_claim_cw_m0", f"{k}_{v}_claim_cw_m1", f"{k}_{v}_claim_cw_m2", f"{k}_{v}_claim_cw"]]
 # %%
 df_claims_all_llms.to_csv("../../data/wsf_arg_plus_per_claim_all_llms.csv", index=False)
