@@ -64,7 +64,7 @@ cat <<EOF > "$SBATCH_SCRIPT"
 #SBATCH --error=./slurmerr/${JOB_NAME}.err
 
 source ../cs_hs_misinfo_env/bin/activate
-python predict.py \\
+python predict_cw.py \\
     llm=${LLM_NAME} \\
     experiment=${EXPERIMENT_NAME} \\
     input.run_name=${JOB_NAME}

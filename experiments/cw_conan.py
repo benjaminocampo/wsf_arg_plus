@@ -51,5 +51,5 @@ responses = llm.chat(
 
 df["cw"] = [r.outputs[0].text for r in responses]
 
-out_file = f"mtconan_llm_pred.csv"
+out_file = f"../data/mtconan_olmo2-32B_cw_predictions.csv"
 df.to_csv(out_file, index=False)
