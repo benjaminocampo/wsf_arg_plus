@@ -7,10 +7,11 @@
 set -euo pipefail
 
 
-# Checks that the user passed at least one argument (the YAML config file).
+# Checks that the user passed three argument (the task script file,
+# the experiment config file, and the LLM config file).
 # Otherwise, prints usage and exits.
-if [ $# -lt 1 ]; then
-  echo "Usage: $0 <experiment_config.yaml> <llm_config.yaml>"
+if [ $# -lt 3 ]; then
+  echo "Usage: $0 <task_script> <experiment_config.yaml> <llm_config.yaml>"
   exit 1
 fi
 
@@ -22,8 +23,11 @@ if command -v sbatch &>/dev/null; then
   mkdir -p slurmerr slurmout
 fi
 
-EXPERIMENT_CONFIG=$1
-LLM_CONFIG=$2
+ENV_NAME="wsf_arg_plus_env"
+
+TASK_SCRIPT=$1
+EXPERIMENT_CONFIG=$2
+LLM_CONFIG=$3
 
 # Takes config file
 # Small inline Python helper to extract YAML values
@@ -63,8 +67,8 @@ cat <<EOF > "$SBATCH_SCRIPT"
 #SBATCH --output=./slurmout/${JOB_NAME}.out
 #SBATCH --error=./slurmerr/${JOB_NAME}.err
 
-source ../cs_hs_misinfo_env/bin/activate
-python predict_cw.py \\
+source ../${ENV_NAME}/bin/activate
+python ${TASK_SCRIPT} \\
     llm=${LLM_NAME} \\
     experiment=${EXPERIMENT_NAME} \\
     input.run_name=${JOB_NAME}
