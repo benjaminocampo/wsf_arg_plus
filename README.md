@@ -1,10 +1,10 @@
 # When Hate Meets Facts: LLMs-in-the-Loop for Checkworthiness Detection in Hate Speech
 
-This paper contains the dataset WSF-ARG+ and the source code for each of the
+This repository contains the dataset WSF-ARG+ and the source code for each of the
 experiments carried out in the paper entitled "When Hate Meets Facts:
 LLMs-in-the-Loop for Checkworthiness Detection in Hate Speech". We also released
 the guidelines and steps necessary to apply our LLM-in-the-loop framework on
-WSF-ARG+ and on other datasets
+WSF-ARG+ and on other datasets.
 
 # Index
 
