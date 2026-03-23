@@ -6,14 +6,15 @@ LLMs-in-the-Loop for Checkworthiness Detection in Hate Speech". We also released
 the guidelines and steps necessary to apply our LLM-in-the-loop framework on
 WSF-ARG+ and on other datasets.
 
-# Index
+## Index
 
 - [Installation](#installation)
 - [Reproducibility of Experiments](#reproducibility-of-experiments)
 - [Results and logging](#results-and-logging)
-- [WSF-ARG+ Dataset](#wsf-arg+-dataset)
+- [WSF-ARG+ Dataset](#wsf-arg-dataset)
+- [How-To Guidelines for Running LLM-in-the-Loop](#how-to-guidelines-for-running-llm-in-the-loop)
 
-# Installation
+## Installation
 
 Create a python environment on your machine. You can use the environment manager
 of preference. For our experiments we used `venv`. Then proceed to install the
@@ -51,7 +52,7 @@ The `.env` file should contain the following environment variable:
 HF_TOKEN=<your-token>
 ```
 
-# Reproducibility of Experiments
+## Reproducibility of Experiments
 
 The `experiments/` directory contains all the runs conducted for this paper. The
 directory `analysis/` contains all the scripts that are necessary to obtain each
@@ -127,7 +128,7 @@ cd experiments/
 bash run_job.sh predict_cw.py conf/experiment/checkworthiness_zero_shot.yaml conf/llm/mistral-7B-small.yaml
 ```
 
-# Results and Logging
+## Results and Logging
 
 All experiment outputs are tracked using `MLflow`. The results directory stores:
 
@@ -148,7 +149,7 @@ mlflow ui
 There you can visualize the recorded generations of your run and the associated
 metrics.
 
-# WSF-ARG+ Dataset
+## WSF-ARG+ Dataset
 
 The dataset is preprocessed from `wsf_arg_plus_raw.csv` using the script in `experiments/analysis/00_data_preprocessing.py`. We organized the data into two tabular formats:
 
@@ -199,3 +200,32 @@ message-level format, we have:
 - `wsf_arg_plus_per_claim_all_llms.csv` that contains the disaggregated and
   aggregated annotations carried out by all our 24 configuration (12 LLMs and 2
   prompting strategies).
+
+## How-To Guidelines for Running LLM-in-the-Loop
+
+As a resource for the NLP community, we release step-by-step instructions to run the proposed LLM-in-the-loop framework not only on WSF-ARG+ but also on other datasets. As one of our main contributions, we aim for LLM-in-the-loop to be easily reproducible, serving as a future direction to be tested across several datasets and domains in order to achieve high-quality labeling through an LLM-as-annotator strategy. We describe the LLM-in-the-loop framework for a task that has $N=3$ labels. As future perspectives we aim to extend the framework for tasks with $N=2$ and $N>3$.
+
+The first step is to have a dataset $D$ that specifies a detection task with $N=3$ labels. For a task with three classes, we may require at least four annotators in a full human annotation setting. Three annotators independently annotate the dataset, and the remaining one acts as a judge for instances where the three first annotators disagree.
+
+In this setting, we aim for reducing the human effort from four annotators to two. We suggest annotating the entire dataset $D$ with one human annotator, one chosen LLM, and adjudicating disagreements with a human judge. This LLM should receive, as instructions, the definition of the task and the classes, as well as prompting strategies such as zero- or one-shot prompting (this can also be extended to more than one shot, i.e., few-shot prompting).
+
+We recommend running our approach using several LLMs, in particular those described in our paper, which establish a good test bed of models and provide an indication across small, medium, and large models, as well as across different LLM families. We suggest running each configuration three times to test prediction variability. Majority voting is used to decide the final labeling; in cases where there is no clear majority-voted class, that is, when the three runs produce three different labels, a judge is required.
+
+- **Step 1**: One annotator labels the entire dataset.
+- **Step 2**: Several LLMs annotate the entire dataset using different prompting strategies (zero-, one-, and few-shot). Configurations depend on model family and size. A possible pool of LLMs configurations can be the one described in our paper and in the `installation` section of this README. Run each configuration three times to measure prediction variability. The final labeling is decided through majority voting. If there is no unique majority-voted label, a judge intervenes.
+- **Step 3**: Calculate alignment metrics between the LLMs and the human annotator, as well as prediction variability across different configuration runs.
+
+We then select the most "suitable" configuration, where suitability depends on percent agreement and inter-annotator agreement (IAA) with the human annotator, low prediction variability, and high IAA among LLMs.
+
+Once the most "suitable" configuration for the dataset $D$ has been selected, we proceed to resolve disagreements between this configuration and the human annotator by asking another human annotator to judge disagreement cases, as well as unstable predictions produced by the LLM. The judge should be blind to the source of the previous annotations. This can be achieved by presenting the labels in random order with anonymous sources, or by completely hiding their origin. Afterwards, the decisions should be computed and reported, measuring agreement with the human annotator, the LLM, or both (if this setting is possible).
+
+- **Step 4**: Choose the most "suitable" configuration for dataset $D$ based on percent agreement, IAA with humans and other LLMs, prediction variability, and prompting strategy.
+- **Step 5**: Ask a human judge to annotate instances where there is disagreement between the human annotator and the chosen configuration. The judge should be blind to the source of the previous labels. A clear report of the judge’s preferences should be carried out.
+
+Finally, if available, these labels should be compared with those obtained from a full human annotation setting to assess the extent to which quality is maintained or lost.
+
+- **Step 6**: If available, compare LLM-in-the-loop annotations with full human annotations to measure and report annotation quality.
+
+As anticipated in the previous sections of this README, `predict_cw.py` is a use case example of Step 2, defining a script for running several configurations and generating annotations with LLMs. The analysis carried out in Steps 3, 4, 5, and 6 can be found in the directory `experiments/analysis/`, where we provide python percent files (similar to notebooks) in which we performed each of the remaining steps.
+
+More specifically, Step 3 is implemented in the files `02_cw_percent_agreement.py`, `03_iaa_olmo2-32B_vs_rest.py`, and `B_pred_variability.py`. Step 4 is carried out by analyzing the results of Step 3. The analysis for Step 5 can be found in `03.1_judge_decisions.py`. Finally, Step 6 is implemented in `04_data_distribution.py` and `A_iaa_full_human.py`
