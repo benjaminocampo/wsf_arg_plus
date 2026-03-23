@@ -6,6 +6,22 @@ LLMs-in-the-Loop for Checkworthiness Detection in Hate Speech". We also released
 the guidelines and steps necessary to apply our LLM-in-the-loop framework on
 WSF-ARG+ and on other datasets.
 
+## TLDR
+
+In this repository, we release:
+
+- The WSF-ARG+ dataset with platinum and gold labels for the check-worthiness
+  detection task in two formats: message-level and claim-level (in `data/`).
+- All LLM predictions in `data/` and configurations in `experiments/conf/`.
+- Reproducibility scripts for each table and result in the paper (in
+  `experiments/analysis/`).
+- A generation script for check-worthiness annotations in `predict_cw.py`.
+- A generation script for hate speech annotations, with and without
+  check-worthiness labels, in `predict_hs.py`.
+- Annotation guidelines in `check-worthiness_annotation_guidelines.pdf`
+Documentation on how to use WSF-ARG+ and how to run LLM-in-the-loop for other
+datasets.
+
 ## Index
 
 - [Installation](#installation)
