@@ -1,0 +1,14 @@
+artifact_uri: /gpfs/home6/nocampo/projects/cs_hs_misinfo/experiments/mlruns/410226340187067821/0c4c4da1dc5c476fbb089c6adde12383/artifacts
+end_time: 1768901979629
+entry_point_name: ''
+experiment_id: '410226340187067821'
+lifecycle_stage: active
+run_id: 0c4c4da1dc5c476fbb089c6adde12383
+run_name: mistral-22B-medium_detect_hs_with_cw_noarg
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1768901850456
+status: 3
+tags: []
+user_id: nocampo

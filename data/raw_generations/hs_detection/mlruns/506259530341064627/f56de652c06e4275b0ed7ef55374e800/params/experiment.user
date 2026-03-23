@@ -1,0 +1,4 @@
+Given this message. Classify if it is either hateful or not.
+
+Input:
+{input_text}

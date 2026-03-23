@@ -1,0 +1,46 @@
+input:
+  skip_hate_data: true
+  data_path: ../data/wsf_arg_extension_with_nohs_cw.csv
+  data_size: 1
+  run_name: commandr-7B-small_detect_hs_base_noarg
+  uri_path: ./mlruns
+llm:
+  slurm_params:
+    partition: gpu_h100
+    time: 00-00:40:00
+    gres: gpu:h100:1
+    mem: 20G
+  name: commandr-7B-small
+  params:
+    model: CohereLabs/c4ai-command-r7b-12-2024
+    max_tokens: 4096
+    max_model_len: 32768
+    max_num_batched_tokens: 32768
+    dtype: auto
+    tensor_parallel_size: 1
+experiment:
+  experiment_name: detect_hs_base_noarg
+  experiment_description: We are labeling the entire HS
+  use_checkworthiness: false
+  system: 'You are an expert model for detecting hate speech in text messages based
+    on the following definition of hate speech:
+
+    Hate speech is considered any kind of content that conveys malevolent intentions
+    toward a group or an individual, and motivated by inherent characteristics that
+    are attributed to that group and shared among its members such as race, color,
+    ethnicity, gender, sexual orientation, nationality, religion, disability, social
+    status, health conditions, or other characteristics.
+
+    '
+  user: 'Given this message. Classify if it is either hateful or not.
+
+
+    Input:
+
+    {input_text}
+
+    '
+  output_labels:
+  - hateful
+  - non-hateful
+

@@ -1,0 +1,14 @@
+artifact_uri: /gpfs/home6/nocampo/projects/cs_hs_misinfo/experiments/mlruns/506259530341064627/f98e5a6e16964e8cb5fcc3cef9945c08/artifacts
+end_time: 1768898374956
+entry_point_name: ''
+experiment_id: '506259530341064627'
+lifecycle_stage: active
+run_id: f98e5a6e16964e8cb5fcc3cef9945c08
+run_name: commandr-104B-big_detect_hs_base_noarg
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1768897996329
+status: 3
+tags: []
+user_id: nocampo

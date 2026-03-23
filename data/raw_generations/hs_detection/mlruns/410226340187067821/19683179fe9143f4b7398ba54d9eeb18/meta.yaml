@@ -1,0 +1,14 @@
+artifact_uri: /gpfs/home6/nocampo/projects/cs_hs_misinfo/experiments/mlruns/410226340187067821/19683179fe9143f4b7398ba54d9eeb18/artifacts
+end_time: 1768898054554
+entry_point_name: ''
+experiment_id: '410226340187067821'
+lifecycle_stage: active
+run_id: 19683179fe9143f4b7398ba54d9eeb18
+run_name: qwen2.5-7B-small_detect_hs_with_cw_noarg
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1768898002581
+status: 3
+tags: []
+user_id: nocampo

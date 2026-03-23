@@ -1,0 +1,14 @@
+artifact_uri: /gpfs/home6/nocampo/projects/cs_hs_misinfo/experiments/mlruns/410226340187067821/4ff4aa97d60d4d63a0aee18609fd54d7/artifacts
+end_time: 1768900574070
+entry_point_name: ''
+experiment_id: '410226340187067821'
+lifecycle_stage: active
+run_id: 4ff4aa97d60d4d63a0aee18609fd54d7
+run_name: mixtral-8x22B-medium_detect_hs_with_cw_noarg
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1768900083332
+status: 3
+tags: []
+user_id: nocampo

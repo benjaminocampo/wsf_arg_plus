@@ -1,0 +1,14 @@
+artifact_uri: /gpfs/home6/nocampo/projects/cs_hs_misinfo/experiments/mlruns/506259530341064627/4160e296755d4a09940121443b8fb499/artifacts
+end_time: 1768902182592
+entry_point_name: ''
+experiment_id: '506259530341064627'
+lifecycle_stage: active
+run_id: 4160e296755d4a09940121443b8fb499
+run_name: llama-70B-big_detect_hs_base_noarg
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1768901869581
+status: 3
+tags: []
+user_id: nocampo

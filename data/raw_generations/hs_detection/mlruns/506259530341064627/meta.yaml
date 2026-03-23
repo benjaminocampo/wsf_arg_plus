@@ -1,0 +1,6 @@
+artifact_location: /gpfs/home6/nocampo/projects/cs_hs_misinfo/experiments/mlruns/506259530341064627
+creation_time: 1768897967318
+experiment_id: '506259530341064627'
+last_update_time: 1768897967318
+lifecycle_stage: active
+name: detect_hs_base_noarg

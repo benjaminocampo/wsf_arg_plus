@@ -1,0 +1,14 @@
+artifact_uri: /gpfs/home6/nocampo/projects/cs_hs_misinfo/experiments/mlruns/506259530341064627/895afaa9a2314c65b844a2918165951d/artifacts
+end_time: 1768898028278
+entry_point_name: ''
+experiment_id: '506259530341064627'
+lifecycle_stage: active
+run_id: 895afaa9a2314c65b844a2918165951d
+run_name: olmo-7B-small_detect_hs_base_noarg
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1768897977510
+status: 3
+tags: []
+user_id: nocampo
