@@ -203,6 +203,8 @@ message-level format, we have:
 
 ## How-To Guidelines for Running LLM-in-the-Loop
 
+![LLM-in-the-loop Framework](./images/llm_in_the_loop_framework.png)
+
 As a resource for the NLP community, we release step-by-step instructions to run the proposed LLM-in-the-loop framework not only on WSF-ARG+ but also on other datasets. As one of our main contributions, we aim for LLM-in-the-loop to be easily reproducible, serving as a future direction to be tested across several datasets and domains in order to achieve high-quality labeling through an LLM-as-annotator strategy. We describe the LLM-in-the-loop framework for a task that has $N=3$ labels. As future perspectives we aim to extend the framework for tasks with $N=2$ and $N>3$.
 
 The first step is to have a dataset $D$ that specifies a detection task with $N=3$ labels. For a task with three classes, we may require at least four annotators in a full human annotation setting. Three annotators independently annotate the dataset, and the remaining one acts as a judge for instances where the three first annotators disagree.
