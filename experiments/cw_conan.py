@@ -29,13 +29,13 @@ llm = LLM(
     tensor_parallel_size=1,
     dtype="auto",
 )
-guided_decoding_params = GuidedDecodingParams(choice=cfg.experiment.output_labels)
+guided_decoding_params = GuidedDecodingParams(choice=output_labels)
 sampling_params = SamplingParams(
     guided_decoding=guided_decoding_params,
     max_tokens=4096,
 )
 
-df = pd.read_csv("Multitarget-CONAN.csv")
+df = pd.read_csv("../data/Multitarget-CONAN.csv")
 
 df["text_prompt"] = df["HATE_SPEECH"].apply(
     lambda t: [
