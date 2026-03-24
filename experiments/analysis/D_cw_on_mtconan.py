@@ -19,7 +19,14 @@ mtconan_count = pd.crosstab(df["TARGET"], df["cw"]).T
 targets = mtconan_count.columns
 for t in targets:
     nof_messages_p_target = mtconan_count[t].sum()
-    mtconan_count[f"{t}_%"] = mtconan_count[t] / nof_messages_p_target
+    mtconan_count[f"{t}_%"] = mtconan_count[t] / nof_messages_p_target * 100
 # %%
-mtconan_count
+mtconan_count.round(2)
+# %%
+order = []
+for t in targets:
+    order.append(t)
+    order.append(f"{t}_%")
+
+mtconan_count[order].round(2)
 # %%

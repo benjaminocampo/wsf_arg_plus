@@ -47,7 +47,7 @@ for r in runs:
     variability_hs[r]["2_%"] = variability_hs[r][2] / len(df_hs) * 100
     variability_hs[r]["1_%"] = variability_hs[r][1] / len(df_hs) * 100
 # %%
-pd.DataFrame(variability_hs).T
+pd.DataFrame(variability_hs).T.round(1)[[3, "3_%", 2, "2_%", 1, "1_%"]]
 # %%
 # Non-HS Table of prediction variability
 df_non_hs = df[df["concat_hate"] == 0]
@@ -64,4 +64,5 @@ for r in runs:
     variability_non_hs[r]["2_%"] = variability_non_hs[r][2] / len(df_non_hs) * 100
     variability_non_hs[r]["1_%"] = variability_non_hs[r][1] / len(df_non_hs) * 100
 # %%
-pd.DataFrame(variability_non_hs).T
+pd.DataFrame(variability_non_hs).T.round(1)[[3, "3_%", 2, "2_%", 1, "1_%"]]
+# %%

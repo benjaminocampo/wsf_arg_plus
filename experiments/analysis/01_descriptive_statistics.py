@@ -49,8 +49,8 @@ premises = ["premise0", "premise1", "premise2", "premise3", "premise4", "premise
 )
 # %%
 # Mean, Std, Min, Max Total Number of Claims on HS messages
-df.loc[df["concat_hate"] == 1, premises + ["conclusion"]].apply(lambda row: row[premises + ["conclusion"]].notna().sum(), axis=1).describe()
+df.loc[df["concat_hate"] == 1, premises + ["conclusion"]].apply(lambda row: row[premises + ["conclusion"]].notna().sum(), axis=1).describe().round(3)
 # %%
 # Mean, Std, Min, Max Total Number of Claims on Non-HS messages
-df.loc[df["concat_hate"] == 0, premises + ["conclusion"]].apply(lambda row: row[premises + ["conclusion"]].notna().sum(), axis=1).describe()
+df.loc[df["concat_hate"] == 0, premises + ["conclusion"]].apply(lambda row: row[premises + ["conclusion"]].notna().sum(), axis=1).describe().round(3)
 # %%

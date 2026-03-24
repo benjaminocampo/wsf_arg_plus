@@ -87,17 +87,50 @@ hs_det_res_df = (
 )
 hs_det_res_df["model_name"] = hs_det_res_df["run_name"].apply(lambda s: s.split("_")[0])
 # %%
-(
+hs_det_res_df_goupby = (
     hs_det_res_df
     .drop(columns=["run_name"])
     .groupby("model_name").mean()
+    .loc[order.values()]
+    .round(3)
 )
 # %%
-(
+small_models = ["Mistral-7B", "Llama-8B", "Olmo2-7B", "Qwen2.5-7B", "Command-r-7B"]
+medium_models = ["Mixtral-8x7B", "Mistral-22B", "Olmo2-32B", "Mixtral-8x22B"]
+large_models = ["Llama-70B", "Qwen2.5-72B", "Command-r-104B",]
+# %%
+hs_det_res_df_goupby.loc["Avg Small"] = (
     hs_det_res_df
     .drop(columns=["run_name"])
-    .groupby("model_name").std()
+    .groupby("model_name").mean()
+    .loc[small_models]
+    .mean()
+    .round(3)
 )
+# %%
+# Medium Models
+hs_det_res_df_goupby.loc["Avg Medium"] = (
+    hs_det_res_df
+    .drop(columns=["run_name"])
+    .groupby("model_name").mean()
+    .loc[medium_models]
+    .mean()
+    .round(3)
+)
+# %%
+# Large Models
+hs_det_res_df_goupby.loc["Avg Large"] = (
+    hs_det_res_df
+    .drop(columns=["run_name"])
+    .groupby("model_name").mean()
+    .loc[large_models]
+    .mean()
+    .round(3)
+)
+# %%
+hs_det_res_df_goupby.loc[small_models + ["Avg Small"] + medium_models + ["Avg Medium"] + large_models + ["Avg Large"]]
+# %%
+hs_det_res_df_goupby.loc[small_models + ["Avg Small"] + medium_models + ["Avg Medium"] + large_models + ["Avg Large"], ["p_macro", "r_macro", "f1_macro"]]
 # %% [markdown]
 # Results of HS detection with check-worthiness
 # %%
@@ -139,17 +172,147 @@ hs_det_w_cw_res_df = (
 )
 hs_det_w_cw_res_df["model_name"] = hs_det_w_cw_res_df["run_name"].apply(lambda s: s.split("_")[0])
 # %%
-(
+hs_det_w_cw_res_df_groupby = (
     hs_det_w_cw_res_df
     .drop(columns=["run_name"])
     .groupby("model_name").mean()
     .loc[order.values()]
+    .round(3)
 )
 # %%
+hs_det_w_cw_res_df_groupby.loc["Avg Small"] = (
+    hs_det_w_cw_res_df
+    .drop(columns=["run_name"])
+    .groupby("model_name").mean()
+    .loc[small_models]
+    .mean()
+    .round(3)
+)
+# %%
+# Medium Models
+hs_det_w_cw_res_df_groupby.loc["Avg Medium"] = (
+    hs_det_w_cw_res_df
+    .drop(columns=["run_name"])
+    .groupby("model_name").mean()
+    .loc[medium_models]
+    .mean()
+    .round(3)
+)
+# %%
+# Large Models
+hs_det_w_cw_res_df_groupby.loc["Avg Large"] = (
+    hs_det_w_cw_res_df
+    .drop(columns=["run_name"])
+    .groupby("model_name").mean()
+    .loc[large_models]
+    .mean()
+    .round(3)
+)
+# %%
+hs_det_w_cw_res_df_groupby.loc[small_models + ["Avg Small"] + medium_models + ["Avg Medium"] + large_models + ["Avg Large"]]
+# %%
+hs_det_w_cw_res_df_groupby.loc[small_models + ["Avg Small"] + medium_models + ["Avg Medium"] + large_models + ["Avg Large"], ["p_macro", "r_macro", "f1_macro"]]
+# %%
+# Tables in the paper
+# %%
+# Macro results of HS Detection with check-worthiness
+hs_det_w_cw_res_df_groupby.loc[small_models + ["Avg Small"] + medium_models + ["Avg Medium"] + large_models + ["Avg Large"], ["p_macro", "r_macro", "f1_macro"]]
+# %%
+# Macro results of HS Detection without check-worthiness
+hs_det_res_df_goupby.loc[small_models + ["Avg Small"] + medium_models + ["Avg Medium"] + large_models + ["Avg Large"], ["p_macro", "r_macro", "f1_macro"]]
+# %%
+# Delta difference on Macro F1 of HS detection: Comparison of check-worthiness labels vs without them
 (
+    hs_det_w_cw_res_df_groupby.loc[small_models + ["Avg Small"] + medium_models + ["Avg Medium"] + large_models + ["Avg Large"], "f1_macro"]
+    -
+    hs_det_res_df_goupby.loc[small_models + ["Avg Small"] + medium_models + ["Avg Medium"] + large_models + ["Avg Large"], "f1_macro"]
+)
+# %% [markdown]
+# ## Standard Deviation, HS Detection without Check-worthiness
+# %%
+hs_det_res_df_goupby_std = (
+    hs_det_res_df
+    .drop(columns=["run_name"])
+    .groupby("model_name").std()
+    .loc[order.values()]
+    .round(3)
+)
+# %%
+hs_det_res_df_goupby_std.loc["Avg Small"] = (
+    hs_det_res_df
+    .drop(columns=["run_name"])
+    .groupby("model_name").std()
+    .loc[small_models]
+    .mean() # The mean of the standard deviations per size
+    .round(3)
+)
+# %%
+# Medium Models
+hs_det_res_df_goupby_std.loc["Avg Medium"] = (
+    hs_det_res_df
+    .drop(columns=["run_name"])
+    .groupby("model_name").std()
+    .loc[medium_models]
+    .mean()
+    .round(3)
+)
+# %%
+# Large Models
+hs_det_res_df_goupby_std.loc["Avg Large"] = (
+    hs_det_res_df
+    .drop(columns=["run_name"])
+    .groupby("model_name").std()
+    .loc[large_models]
+    .mean()
+    .round(3)
+)
+# %%
+hs_det_res_df_goupby_std.loc[small_models + ["Avg Small"] + medium_models + ["Avg Medium"] + large_models + ["Avg Large"], ["p_macro", "r_macro", "f1_macro"]]
+# %%
+# %% [markdown]
+# ## Standard Deviation, HS Detection with Check-worthiness
+# %%
+hs_det_w_cw_res_df_groupby_std = (
     hs_det_w_cw_res_df
     .drop(columns=["run_name"])
     .groupby("model_name").std()
     .loc[order.values()]
+    .round(3)
 )
 # %%
+hs_det_w_cw_res_df_groupby_std.loc["Avg Small"] = (
+    hs_det_w_cw_res_df
+    .drop(columns=["run_name"])
+    .groupby("model_name").std()
+    .loc[small_models]
+    .mean()
+    .round(3)
+)
+# %%
+# Medium Models
+hs_det_w_cw_res_df_groupby_std.loc["Avg Medium"] = (
+    hs_det_w_cw_res_df
+    .drop(columns=["run_name"])
+    .groupby("model_name").std()
+    .loc[medium_models]
+    .mean()
+    .round(3)
+)
+# %%
+# Large Models
+hs_det_w_cw_res_df_groupby_std.loc["Avg Large"] = (
+    hs_det_w_cw_res_df
+    .drop(columns=["run_name"])
+    .groupby("model_name").std()
+    .loc[large_models]
+    .mean()
+    .round(3)
+)
+# %% [markdown]
+# ## Final Tables of Standard Deviation
+# %%
+# Standard on HS detection with check-worthiness
+hs_det_w_cw_res_df_groupby_std.loc[small_models + ["Avg Small"] + medium_models + ["Avg Medium"] + large_models + ["Avg Large"], ["p_macro", "r_macro", "f1_macro"]]
+# %%
+# Standard on HS detection without check-worthiness
+hs_det_res_df_goupby_std.loc[small_models + ["Avg Small"] + medium_models + ["Avg Medium"] + large_models + ["Avg Large"], ["p_macro", "r_macro", "f1_macro"]]

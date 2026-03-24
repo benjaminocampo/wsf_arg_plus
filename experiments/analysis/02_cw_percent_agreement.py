@@ -23,6 +23,10 @@ runs = {
 	"Command-r-104B": ["zero", "one"],
 }
 runs = [f"{model_name}_{shot}" for model_name, shots in runs.items() for shot in shots]
+# %% [markdown]
+# We calculate for all the run configurations (12 LLMs x 2 prompts (zero + one
+# shot) = 24 configurations) the percent agreement with the first annotator
+# (named annA)
 # %%
 claim_gold_annA_hs = claim_gold_annA[claim_gold_annA["concat_hate"] == 1]
 claim_gold_annA_non_hs = claim_gold_annA[claim_gold_annA["concat_hate"] == 0]
@@ -33,13 +37,47 @@ for r in runs:
     percent_agreement_tab[r] = {}
     percent_agreement_tab[r]["all_claims_hs"] = (claim_gold_annA_hs["claim_cw_annA_gold"] == llm_mv_hs[f"{r}_claim_cw"]).sum() / len(claim_gold_annA_hs["claim_cw_annA_gold"])
     percent_agreement_tab[r]["CFS_hs"] = ((claim_gold_annA_hs["claim_cw_annA_gold"] == llm_mv_hs[f"{r}_claim_cw"]) & (claim_gold_annA_hs["claim_cw_annA_gold"] == "CFS")).sum() / sum(claim_gold_annA_hs["claim_cw_annA_gold"] == "CFS")
-    percent_agreement_tab[r]["UFS_hs"] = ((claim_gold_annA_hs["claim_cw_annA_gold"] == llm_mv_hs[f"{r}_claim_cw"]) & (claim_gold_annA_hs["claim_cw_annA_gold"] == "UFS")).sum() / sum(claim_gold_annA_hs["claim_cw_annA_gold"] == "UFS")
     percent_agreement_tab[r]["NFS_hs"] = ((claim_gold_annA_hs["claim_cw_annA_gold"] == llm_mv_hs[f"{r}_claim_cw"]) & (claim_gold_annA_hs["claim_cw_annA_gold"] == "NFS")).sum() / sum(claim_gold_annA_hs["claim_cw_annA_gold"] == "NFS")
+    percent_agreement_tab[r]["UFS_hs"] = ((claim_gold_annA_hs["claim_cw_annA_gold"] == llm_mv_hs[f"{r}_claim_cw"]) & (claim_gold_annA_hs["claim_cw_annA_gold"] == "UFS")).sum() / sum(claim_gold_annA_hs["claim_cw_annA_gold"] == "UFS")
 
     percent_agreement_tab[r]["all_claims_non_hs"] = (claim_gold_annA_non_hs["claim_cw_annA_gold"] == llm_mv_non_hs[f"{r}_claim_cw"]).sum() / len(claim_gold_annA_non_hs["claim_cw_annA_gold"])
     percent_agreement_tab[r]["CFS_non_hs"] = ((claim_gold_annA_non_hs["claim_cw_annA_gold"] == llm_mv_non_hs[f"{r}_claim_cw"]) & (claim_gold_annA_non_hs["claim_cw_annA_gold"] == "CFS")).sum() / sum(claim_gold_annA_non_hs["claim_cw_annA_gold"] == "CFS")
-    percent_agreement_tab[r]["UFS_non_hs"] = ((claim_gold_annA_non_hs["claim_cw_annA_gold"] == llm_mv_non_hs[f"{r}_claim_cw"]) & (claim_gold_annA_non_hs["claim_cw_annA_gold"] == "UFS")).sum() / sum(claim_gold_annA_non_hs["claim_cw_annA_gold"] == "UFS")
     percent_agreement_tab[r]["NFS_non_hs"] = ((claim_gold_annA_non_hs["claim_cw_annA_gold"] == llm_mv_non_hs[f"{r}_claim_cw"]) & (claim_gold_annA_non_hs["claim_cw_annA_gold"] == "NFS")).sum() / sum(claim_gold_annA_non_hs["claim_cw_annA_gold"] == "NFS")
+    percent_agreement_tab[r]["UFS_non_hs"] = ((claim_gold_annA_non_hs["claim_cw_annA_gold"] == llm_mv_non_hs[f"{r}_claim_cw"]) & (claim_gold_annA_non_hs["claim_cw_annA_gold"] == "UFS")).sum() / sum(claim_gold_annA_non_hs["claim_cw_annA_gold"] == "UFS")
 # %%
-pd.DataFrame(percent_agreement_tab).T
+# We are using rounding to 3 digits in the paper.
+# Note: This percent agreement is calculated with the majority voting labels.
+pd.DataFrame(percent_agreement_tab).T.round(3)
+# %% [markdown]
+# For each of the 24 configurations, we run it 3 times obtaining 96 runs which
+# we calculate the percent agreement and we calculate the standard deviation.
+# %%
+percent_agreement_tab_disagg = {}
+for r in runs:
+    for m in range(3):
+        percent_agreement_tab_disagg[f"{r}_{m}"] = {}
+        percent_agreement_tab_disagg[f"{r}_{m}"]["all_claims_hs"] = (claim_gold_annA_hs["claim_cw_annA_gold"] == llm_mv_hs[f"{r}_claim_cw_m{m}"]).sum() / len(claim_gold_annA_hs["claim_cw_annA_gold"])
+        percent_agreement_tab_disagg[f"{r}_{m}"]["CFS_hs"] = ((claim_gold_annA_hs["claim_cw_annA_gold"] == llm_mv_hs[f"{r}_claim_cw_m{m}"]) & (claim_gold_annA_hs["claim_cw_annA_gold"] == "CFS")).sum() / sum(claim_gold_annA_hs["claim_cw_annA_gold"] == "CFS")
+        percent_agreement_tab_disagg[f"{r}_{m}"]["NFS_hs"] = ((claim_gold_annA_hs["claim_cw_annA_gold"] == llm_mv_hs[f"{r}_claim_cw_m{m}"]) & (claim_gold_annA_hs["claim_cw_annA_gold"] == "NFS")).sum() / sum(claim_gold_annA_hs["claim_cw_annA_gold"] == "NFS")
+        percent_agreement_tab_disagg[f"{r}_{m}"]["UFS_hs"] = ((claim_gold_annA_hs["claim_cw_annA_gold"] == llm_mv_hs[f"{r}_claim_cw_m{m}"]) & (claim_gold_annA_hs["claim_cw_annA_gold"] == "UFS")).sum() / sum(claim_gold_annA_hs["claim_cw_annA_gold"] == "UFS")
+
+        percent_agreement_tab_disagg[f"{r}_{m}"]["all_claims_non_hs"] = (claim_gold_annA_non_hs["claim_cw_annA_gold"] == llm_mv_non_hs[f"{r}_claim_cw_m{m}"]).sum() / len(claim_gold_annA_non_hs["claim_cw_annA_gold"])
+        percent_agreement_tab_disagg[f"{r}_{m}"]["CFS_non_hs"] = ((claim_gold_annA_non_hs["claim_cw_annA_gold"] == llm_mv_non_hs[f"{r}_claim_cw_m{m}"]) & (claim_gold_annA_non_hs["claim_cw_annA_gold"] == "CFS")).sum() / sum(claim_gold_annA_non_hs["claim_cw_annA_gold"] == "CFS")
+        percent_agreement_tab_disagg[f"{r}_{m}"]["NFS_non_hs"] = ((claim_gold_annA_non_hs["claim_cw_annA_gold"] == llm_mv_non_hs[f"{r}_claim_cw_m{m}"]) & (claim_gold_annA_non_hs["claim_cw_annA_gold"] == "NFS")).sum() / sum(claim_gold_annA_non_hs["claim_cw_annA_gold"] == "NFS")
+        percent_agreement_tab_disagg[f"{r}_{m}"]["UFS_non_hs"] = ((claim_gold_annA_non_hs["claim_cw_annA_gold"] == llm_mv_non_hs[f"{r}_claim_cw_m{m}"]) & (claim_gold_annA_non_hs["claim_cw_annA_gold"] == "UFS")).sum() / sum(claim_gold_annA_non_hs["claim_cw_annA_gold"] == "UFS")
+# %%
+df_percent_agreement_tab_disagg = pd.DataFrame(percent_agreement_tab_disagg).T
+# %%
+df_percent_agreement_tab_disagg = df_percent_agreement_tab_disagg.reset_index().rename(columns={"index": "run_name"})
+# %%
+df_percent_agreement_tab_disagg["model"] = df_percent_agreement_tab_disagg["run_name"].apply(lambda s: "_".join(s.split("_")[:2]))
+# %%
+(
+    df_percent_agreement_tab_disagg
+    .drop(columns=["run_name"])
+    .groupby("model")
+    .std()
+    .round(3)
+    .loc[runs]
+)
 # %%

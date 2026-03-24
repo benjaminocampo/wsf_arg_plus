@@ -33,7 +33,7 @@ res_mod_tool_hs = res_mod_tool.loc[
     ["contains_cw"] + cols_scores
 ]
 # %%
-res_mod_tool_hs.groupby("contains_cw").mean().T
+res_mod_tool_hs.groupby("contains_cw").mean().T.round(3)
 # %%
 from scipy.stats import mannwhitneyu
 
@@ -56,5 +56,13 @@ stat_test = pd.DataFrame(
 # %%
 stat_test["effect_size"] = 1 - (2 * stat_test["stat"]) / (len(res_mod_tool_hs[res_mod_tool_hs["contains_cw"]]) * len(res_mod_tool_hs[~res_mod_tool_hs["contains_cw"]])) 
 # %%
-stat_test
+stat_test["w/o_cw"] = res_mod_tool_hs.groupby("contains_cw").mean().T[False]
+stat_test["w_cw"] = res_mod_tool_hs.groupby("contains_cw").mean().T[True]
+stat_test["p"] = stat_test["p"].astype(float)
+stat_test["stat"] = stat_test["stat"].astype(float)
+stat_test["effect_size"] = stat_test["effect_size"].astype(float)
+# %%
+stat_test.round(3)
+# %%
+stat_test[stat_test["is_significant"]].round(3)
 # %%

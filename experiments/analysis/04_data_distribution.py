@@ -19,4 +19,3 @@ pd.crosstab(df["concat_hate"], df["claim_cw_gold"]).T
 # %%
 # claim_hate has null values for Non-HS messages so the counting of pd.crosstab doesn't consider the Non-HS part.
 pd.crosstab(df["claim_hate"], df["claim_cw_gold"])
-# %%
