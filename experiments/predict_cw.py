@@ -58,17 +58,17 @@ def run_experiment(cfg: DictConfig, run: mlflow.ActiveRun):
 
     arg_cols = ["premise0", "premise1", "premise2", "premise3", "premise4", "premise5", "conclusion"]
     for col in arg_cols:
-        df.loc[(df["concat_hate"] == 0) | cfg.input.skip_hate_data, f"{col}_cw_annB"] = df.loc[(df["concat_hate"] == 0) | cfg.input.skip_hate_data, col].apply(
+        df[f"{col}_cw_annB_pred"] = df[col].apply(
             lambda t: [
                 {"role": "system", "content": cfg.experiment.system},
                 {"role": "user", "content": cfg.experiment.user.format(input_text=t)},
             ]
         )
         responses = llm.chat(
-            messages=df.loc[(df["concat_hate"] == 0) | cfg.input.skip_hate_data, f"{col}_cw_annB"].tolist(),
+            messages=df[f"{col}_cw_annB_pred"].tolist(),
             sampling_params=sampling_params,
         )
-        df.loc[(df["concat_hate"] == 0) | cfg.input.skip_hate_data, f"{col}_cw_annB"] = [r.outputs[0].text for r in responses]
+        df[f"{col}_cw_annB_pred"] = [r.outputs[0].text for r in responses]
 
     out_file = f"{cfg.input.run_name}_llm_pred.csv"
     df.to_csv(out_file, index=False)
