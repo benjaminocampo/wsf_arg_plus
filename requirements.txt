@@ -8,3 +8,4 @@ vllm
 python-dotenv
 scipy
 krippendorff
+seaborn
