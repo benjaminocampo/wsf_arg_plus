@@ -66,33 +66,44 @@ def run_experiment(cfg: DictConfig, run: mlflow.ActiveRun):
 
     cols = ["premise0", "premise1", "premise2", "premise3", "premise4", "premise5", "conclusion"]
 
-    for c in cols:
-        df[f"{c}_cw_final"] = df[[f"{c}_cw_annA", f"{c}_cw_annB", f"{c}_cw_final"]].apply(lambda t: t[f"{c}_cw_annA"] if t[f"{c}_cw_annA"] == t[f"{c}_cw_annB"] else t[f"{c}_cw_final"], axis=1)
+    df[f"{col}_cw_{cfg.experiment.cw_quality}_repl"] = df[f"{col}_cw_{cfg.experiment.cw_quality}"].replace(replacements)
 
     concat_texts = []
     for _, row in df.iterrows():
         concat_text = ""
         for col in cols:
-            if pd.isna(row[col]):
+            # All row[col] are annotated so this check can be done as well on
+            # the full text. However, we prefer to do it on the label directly
+            if pd.isna(row[f"{col}_cw_{cfg.experiment.cw_quality}_repl"]):
                 continue
-            if row["use_claims_only"] == "yes":
-                if row[col].strip(".") == "":
-                    continue
+
+            if row["is_argument"] == "yes":
                 if cfg.experiment.use_checkworthiness:
-                    concat_text += f'[{replacements[row[f"{col}_cw_final"]]}] {row[col].strip(".")} [/{replacements[row[f"{col}_cw_final"]]}]. '
+                    concat_text += (
+                        f'[{df[f"{col}_cw_{cfg.experiment.cw_quality}_repl"]}] ' + # Start of the wrapping
+                        f'{row[col].strip(".")} ' + # Claim
+                        f'[/{row[f"{col}_cw_{cfg.experiment.cw_quality}_repl"]}]. ' # end of the wrapping (space for next claim)
+                    )
                 else:
                     concat_text += f'{row[col].strip(".")}. '
             else:
-                if row[col].strip(".") == "":
-                    continue
                 if col == "conclusion":
                     if cfg.experiment.use_checkworthiness:
-                        concat_text += f'Therefore, [{replacements[row[f"{col}_cw_final"]]}] {row[col].strip(".")} [/{replacements[row[f"{col}_cw_final"]]}].'
+                        concat_text += (
+                            'Therefore, ' +
+                            f'[{row[f"{col}_cw_{cfg.experiment.cw_quality}_repl"]}] ' +
+                            f'{row[col].strip(".")} ' +
+                            f'[/{row[f"{col}_cw_{cfg.experiment.cw_quality}_repl"]}].'
+                        )
                     else:
                         concat_text += f'Therefore, {row[col].strip(".")}.'
                 else:
                     if cfg.experiment.use_checkworthiness:
-                        concat_text += f'[{replacements[row[f"{col}_cw_final"]]}] {row[col].strip(".")} [/{replacements[row[f"{col}_cw_final"]]}]. '
+                        concat_text += (
+                            f'[{row[f"{col}_cw_{cfg.experiment.cw_quality}_repl"]}] ' +
+                            f'{row[col].strip(".")} ' +
+                            f'[/{row[f"{col}_cw_{cfg.experiment.cw_quality}_repl"]}]. '
+                        )
                     else:
                         concat_text += f'{row[col].strip(".")}. '
         concat_texts.append(concat_text)
