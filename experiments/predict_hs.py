@@ -126,23 +126,20 @@ def run_experiment(cfg: DictConfig, run: mlflow.ActiveRun):
     df["concat_pred_hate"] = df["concat_pred_hate"].replace({"hateful": 1, "non-hateful": 0})
     y_true = df["concat_hate"].astype(int)
     y_pred = df["concat_pred_hate"].astype(int)
-    p_macro, r_macro, f1_macro, support_macro = precision_recall_fscore_support(y_true, y_pred, average='macro')
-    p_micro, r_micro, f1_micro, support_micro = precision_recall_fscore_support(y_true, y_pred, average='micro')
-    p_weighted, r_weighted, f1_weighted, support_weighted = precision_recall_fscore_support(y_true, y_pred, average='weighted')
+    p_macro, r_macro, f1_macro, _ = precision_recall_fscore_support(y_true, y_pred, average='macro')
+    p_micro, r_micro, f1_micro, _ = precision_recall_fscore_support(y_true, y_pred, average='micro')
+    p_weighted, r_weighted, f1_weighted, _ = precision_recall_fscore_support(y_true, y_pred, average='weighted')
     
     results = {
         "p_macro": p_macro,
         "r_macro": r_macro,
         "f1_macro": f1_macro,
-        "support_macro": support_macro,
         "p_micro": p_micro,
         "r_micro": r_micro,
         "f1_micro": f1_micro,
-        "support_micro": support_micro,
         "p_weighted": p_weighted,
         "r_weighted": r_weighted,
         "f1_weighted": f1_weighted,
-        "support_weighted": support_weighted
     }
     mlflow.log_metrics(results)
     out_file = f"{cfg.input.run_name}_llm_pred.csv"
