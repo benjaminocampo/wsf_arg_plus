@@ -19,7 +19,7 @@ In this repository, we release:
 - A generation script for hate speech annotations, with and without
   check-worthiness labels, in `predict_hs.py`.
 - Annotation guidelines in `check-worthiness_annotation_guidelines.pdf`
-Documentation on how to use WSF-ARG+ and how to run LLM-in-the-loop for other
+- Documentation on how to use WSF-ARG+ and how to run LLM-in-the-loop for other
 datasets.
 
 ## Index
