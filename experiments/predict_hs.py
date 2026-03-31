@@ -66,7 +66,8 @@ def run_experiment(cfg: DictConfig, run: mlflow.ActiveRun):
 
     cols = ["premise0", "premise1", "premise2", "premise3", "premise4", "premise5", "conclusion"]
 
-    df[f"{col}_cw_{cfg.experiment.cw_quality}_repl"] = df[f"{col}_cw_{cfg.experiment.cw_quality}"].replace(replacements)
+    for col in cols:
+        df[f"{col}_cw_{cfg.experiment.cw_quality}_repl"] = df[f"{col}_cw_{cfg.experiment.cw_quality}"].replace(replacements)
 
     concat_texts = []
     for _, row in df.iterrows():
