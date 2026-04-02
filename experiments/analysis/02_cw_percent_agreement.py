@@ -80,4 +80,56 @@ df_percent_agreement_tab_disagg["model"] = df_percent_agreement_tab_disagg["run_
     .round(3)
     .loc[runs]
 )
+# %% [markdown]
+# Majority voting of the runs with platinum using F1-score.
+# %%
+from sklearn.metrics import precision_recall_fscore_support
+
+results_f1 = {}
+for r in runs:
+    y_pred = df[f"{r}_claim_cw"]
+    y_true = df["claim_cw_platinum"]
+
+    p_macro, r_macro, f1_macro, _ = precision_recall_fscore_support(y_true, y_pred, average='macro', labels=["NFS", "UFS", "CFS"])
+    p_macro, r_macro, f1_macro, _ = precision_recall_fscore_support(y_true, y_pred, average='macro', labels=["NFS", "UFS", "CFS"])
+    
+    res = {
+        "p_macro": p_macro,
+        "r_macro": r_macro,
+        "f1_macro": f1_macro,
+    }
+    results_f1[r] = res
+# %%
+pd.DataFrame(results_f1).T
+# %%
+# Mean and std of the runs when compared with platinum labels using F1-score.
+# %%
+results_f1_disagg = {}
+for r in runs:
+    for i in range(3): # We predicted cw labels 3 times per run.
+        y_pred = df[f"{r}_claim_cw_m{i}"]
+        y_true = df["claim_cw_platinum"]
+
+        p_macro, r_macro, f1_macro, _ = precision_recall_fscore_support(y_true, y_pred, average='macro', labels=["NFS", "UFS", "CFS"])
+        p_macro, r_macro, f1_macro, _ = precision_recall_fscore_support(y_true, y_pred, average='macro', labels=["NFS", "UFS", "CFS"])
+
+        res = {
+            "p_macro": p_macro,
+            "r_macro": r_macro,
+            "f1_macro": f1_macro,
+        }
+        results_f1_disagg[f"{r}_m{i}"] = res
+# %%
+df_f1_res_disagg = pd.DataFrame(results_f1_disagg).T
+# %%
+df_f1_res_disagg = df_f1_res_disagg.reset_index().rename(columns={"index": "run"})
+df_f1_res_disagg["model_name"] = df_f1_res_disagg["run"].apply(lambda r: "_".join(r.split("_")[:-1]))
+# %%
+(
+    df_f1_res_disagg[["model_name", "p_macro", "r_macro", "f1_macro"]]
+    .groupby("model_name")
+    .agg(["mean", "std"])
+    .loc[runs]
+    .round(3)
+)
 # %%

@@ -8,6 +8,8 @@ import pandas as pd
 
 all_runs = glob("../../data/raw_generations/hs_detection/**/**/**/**/**.csv")
 # %%
+df_orig = pd.read_csv("../../data/wsf_arg_plus_per_message.csv")
+# %%
 order = {
     "mistral-7B-small": "Mistral-7B",
     "llama-8B-small": "Llama-8B",
@@ -76,6 +78,7 @@ for path in hs_res_wo_cw:
         "f1_weighted": f1_weighted,
     }
     hs_det_res[f"{run_name}_{run_id}"] = results
+    df_orig[f"{run_name}_{run_id}_wo_cw_concat_pred_hate"] = y_pred
 
 # %%
 hs_det_res_df = pd.DataFrame(hs_det_res).T
@@ -161,6 +164,7 @@ for path in hs_res_w_cw:
         "f1_weighted": f1_weighted,
     }
     hs_det_w_cw_res[f"{run_name}_{run_id}"] = results
+    df_orig[f"{run_name}_{run_id}_w_cw_concat_pred_hate"] = y_pred
 
 # %%
 hs_det_w_cw_res_df = pd.DataFrame(hs_det_w_cw_res).T
@@ -316,3 +320,50 @@ hs_det_w_cw_res_df_groupby_std.loc[small_models + ["Avg Small"] + medium_models 
 # %%
 # Standard on HS detection without check-worthiness
 hs_det_res_df_goupby_std.loc[small_models + ["Avg Small"] + medium_models + ["Avg Medium"] + large_models + ["Avg Large"], ["p_macro", "r_macro", "f1_macro"]]
+# %% [markdown]
+# ## Statistical Significance
+# In this part we calculate the majority voting for the 3 runs per model we did
+# on HS detection for check-worthiness and without check-worthiness labels. We
+# report F1 and statistical significance test.
+# %%
+df_orig
+# %%
+from statsmodels.stats.contingency_tables import mcnemar
+import numpy as np
+
+results_mv = {}
+for model_name in order.values():
+    pred_cols = [c for c in df_orig.columns if c.startswith(model_name)]
+    pred_cols_w_cw = [c for c in pred_cols if c.endswith("_w_cw_concat_pred_hate")]
+    pred_cols_wo_cw = [c for c in pred_cols if c.endswith("_wo_cw_concat_pred_hate")]
+    y_pred_mv_w_cw = df_orig[pred_cols_w_cw].apply(lambda row: row.sum() >= 2, axis=1).astype(int)
+    y_pred_mv_wo_cw = df_orig[pred_cols_wo_cw].apply(lambda row: row.sum() >= 2, axis=1).astype(int)
+    y_true = df_orig["concat_hate"]
+
+    p_macro_w_cw, r_macro_w_cw, f1_macro_w_cw, _ = precision_recall_fscore_support(y_true, y_pred_mv_w_cw, average='macro')
+    p_macro_wo_cw, r_macro_wo_cw, f1_macro_wo_cw, _ = precision_recall_fscore_support(y_true, y_pred_mv_wo_cw, average='macro')
+    
+    # Two-sided McNemar test
+    b = np.sum((y_pred_mv_w_cw == 1) & (y_pred_mv_wo_cw == 0))
+    c = np.sum((y_pred_mv_w_cw == 0) & (y_pred_mv_wo_cw == 1))
+
+    table = [[0, b],
+             [c, 0]]
+
+    stat_test = mcnemar(table, exact=True)
+
+    res = {
+        "p_macro_w_cw": p_macro_w_cw,
+        "r_macro_w_cw": r_macro_w_cw,
+        "f1_macro_w_cw": f1_macro_w_cw,
+        "p_macro_wo_cw": p_macro_wo_cw,
+        "r_macro_wo_cw": r_macro_wo_cw,
+        "f1_macro_wo_cw": f1_macro_wo_cw,
+        "stat": stat_test.statistic,
+        "p-value": stat_test.pvalue,
+    }
+
+    results_mv[model_name] = res
+# %%
+pd.DataFrame(results_mv).T.round(3)
+# %%
