@@ -4,7 +4,6 @@ defaults:
   - experiment: checkworthiness_zero_shot
 
 input:
-  skip_hate_data: true
   data_path: ../data/wsf_arg_plus_per_message.csv
   data_size: 1                  # This parameter is just for testing. Should be equal to 1
   run_name: null                   # Run name will be the same as the llm name
