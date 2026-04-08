@@ -34,7 +34,9 @@ sampling_params = SamplingParams(
     guided_decoding=guided_decoding_params,
     max_tokens=4096,
 )
-
+# MT-CONAN should be downloaded from the original repository that released it
+# and be placed in the `data/` directory. Due to Licensing of MT-CONAN,
+# it can not be redistributed.
 df = pd.read_csv("../data/Multitarget-CONAN.csv")
 
 df["text_prompt"] = df["HATE_SPEECH"].apply(
