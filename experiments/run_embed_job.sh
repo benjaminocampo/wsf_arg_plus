@@ -67,7 +67,7 @@ cat <<EOF > "$SBATCH_SCRIPT"
 #SBATCH --error=./slurmerr/${JOB_NAME}.err
 
 source ../${ENV_NAME}/bin/activate
-python embed_then_predict.py \\
+python embed.py \\
     llm=${LLM_NAME} \\
     experiment=${EXPERIMENT_NAME} \\
     input.run_name=${JOB_NAME} \\
