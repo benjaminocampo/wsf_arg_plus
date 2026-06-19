@@ -150,8 +150,8 @@ def run_experiment(cfg: DictConfig, run: mlflow.ActiveRun):
                 results.append(res)
 
     df_results = pd.DataFrame(results)
-    df_results.to_csv(f"{cfg.experiment.path_results}/{cfg.run_name}.csv", index=False)
-    mlflow.log_artifact(f"{cfg.experiment.path_results}/{cfg.run_name}.csv")
+    df_results.to_csv(f"{cfg.experiment.path_results}/{cfg.input.run_name}.csv", index=False)
+    mlflow.log_artifact(f"{cfg.experiment.path_results}/{cfg.input.run_name}.csv")
 
 
 @hydra.main(config_path="conf", config_name="config", version_base=None)
