@@ -51,8 +51,6 @@ def run_experiment(cfg: DictConfig, run: mlflow.ActiveRun):
 
     llm = LLM(
         model=cfg.llm.params.model,
-        #max_model_len=cfg.llm.params.max_model_len,
-        #max_num_batched_tokens=cfg.llm.params.max_num_batched_tokens,
         tensor_parallel_size=cfg.llm.params.tensor_parallel_size,
         dtype=cfg.llm.params.dtype,
         runner="pooling"
@@ -100,6 +98,13 @@ def run_experiment(cfg: DictConfig, run: mlflow.ActiveRun):
         else:
             assert False
 
+    large_flatten = [f"{model_name}_{shot}_claim_cw" for model_name, shots in large.items() for shot in shots]
+    large = {
+	    "Llama-70B": ["zero", "one"],
+	    "Qwen2.5-72B": ["zero", "one"],
+	    "Command-r-104B": ["zero", "one"],
+    }
+
     results = []
     for split_id, (train_idx, test_idx) in enumerate(sss.split(df, y)):
         # single shuffle -> nested subsets
@@ -108,50 +113,72 @@ def run_experiment(cfg: DictConfig, run: mlflow.ActiveRun):
         
         # We declare test data, training will be done after
         y_test = y.iloc[test_idx]
-        X = df["embed"]
+        X_embed = df["embed"]
 
-        X_pool = X.iloc[train_idx] 
-        y_pool = y.iloc[train_idx]
-        X_test = X.iloc[test_idx]
-        X_test_matrix = np.vstack(X_test.values)
+        for ann in ["base", "only_llms", "annA", "annB", "annC"]:
 
-        X_pool = X_pool.iloc[order].reset_index(drop=True)
-        y_pool = y_pool.iloc[order].reset_index(drop=True)
-        
-        for frac in fractions[1:]:
-            n_samples = int(frac * N)
+            if ann == "base":
+                # No llm predictions, no annotations from humans, concat with empty
+                X_llm_preds = pd.DataFrame(index=range(len(df)))
+            elif ann == "only_llms":
+                # Encode of only llms
+                X_llm_preds = pd.get_dummies(df[large_flatten]).astype(int)
+            else:
+                # Encode of llms + annotators
+                X_llm_preds = pd.get_dummies(df[large_flatten + [f"claim_cw_{ann}_platinum"]]).astype(int)
 
-            X_sub = X_pool.iloc[:n_samples]
-            X_sub_matrix = np.vstack(X_sub.values)
-            y_sub = y_pool.iloc[:n_samples]
+            X_pool_embed = X_embed.iloc[train_idx]
+            X_pool_llm_preds = X_llm_preds.iloc[train_idx]
 
-            for model_name, model in models.items():
-                clf = clone(model)
-                clf.fit(X_sub_matrix, y_sub)
-                preds = clf.predict(X_test_matrix)
-                predict_proba = clf.predict_proba(X_test_matrix)
-                p, r, f1, _ = precision_recall_fscore_support(y_test, preds, average="macro")
-                kappa = cohen_kappa_score(y_test, preds, weights="linear", labels=[0, 1, 2])
+            X_test_embed = X_embed.iloc[test_idx]
+            X_test_llm_preds = X_llm_preds.iloc[test_idx]
+            X_test_embed_matrix = np.vstack(X_test_embed.values)
+            X_test_matrix = np.hstack((X_test_embed_matrix, X_test_llm_preds))
 
-                res = {
-                    "split": split_id,
-                    "llm": cfg.llm.name,
-                    "model": model_name,
-                    "train_frac": frac,
-                    "n_train": n_samples,
-                    "p": p,
-                    "r": r,
-                    "f1": f1,
-                    "kappa": kappa,
-                    "y_test": y_test.replace({0: "NFS", 1: "UFS", 2: "CFS"}),
-                    "pred": pd.Series([to_cat_labels(p) for p in preds]),
-                    "predict_proba": predict_proba
-                }
-                results.append(res)
+            y_pool = y.iloc[train_idx]
 
-    df_results = pd.DataFrame(results)
-    df_results.to_csv(f"{cfg.experiment.path_results}/{cfg.input.run_name}.csv", index=False)
-    mlflow.log_artifact(f"{cfg.experiment.path_results}/{cfg.input.run_name}.csv")
+            X_pool_embed = X_pool_embed.iloc[order].reset_index(drop=True)
+            X_pool_llm_preds = X_pool_llm_preds.iloc[order].reset_index(drop=True)
+            y_pool = y_pool.iloc[order].reset_index(drop=True)
+
+            for frac in fractions[1:]:
+                n_samples = int(frac * N)
+
+                X_sub_embed = X_pool_embed.iloc[:n_samples]
+                X_sub_llm_preds = X_pool_llm_preds.iloc[:n_samples]
+                X_sub_embed_matrix = np.vstack(X_sub_embed.values)
+                X_sub_matrix = np.hstack((X_sub_embed_matrix, X_sub_llm_preds))
+
+                y_sub = y_pool.iloc[:n_samples]
+
+                for model_name, model in models.items():
+                    clf = clone(model)
+                    clf.fit(X_sub_matrix, y_sub)
+                    preds = clf.predict(X_test_matrix)
+                    predict_proba = clf.predict_proba(X_test_matrix)
+                    p, r, f1, _ = precision_recall_fscore_support(y_test, preds, average="macro")
+                    kappa = cohen_kappa_score(y_test, preds, weights="linear", labels=[0, 1, 2])
+
+                    res = {
+                        "split": split_id,
+                        "llm": cfg.llm.name,
+                        "model": model_name,
+                        "ann": ann,
+                        "train_frac": frac,
+                        "n_train": n_samples,
+                        "p": p,
+                        "r": r,
+                        "f1": f1,
+                        "kappa": kappa,
+                        "y_test": y_test.replace({0: "NFS", 1: "UFS", 2: "CFS"}),
+                        "pred": pd.Series([to_cat_labels(p) for p in preds]),
+                        "predict_proba": predict_proba
+                    }
+                    results.append(res)
+
+        df_results = pd.DataFrame(results)
+        df_results.to_csv(f"{cfg.experiment.path_results}/{cfg.input.run_name}.csv", index=False)
+        mlflow.log_artifact(f"{cfg.experiment.path_results}/{cfg.input.run_name}.csv")
 
 
 @hydra.main(config_path="conf", config_name="config", version_base=None)
