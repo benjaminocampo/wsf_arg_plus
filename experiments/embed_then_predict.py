@@ -100,6 +100,7 @@ def run_experiment(cfg: DictConfig, run: mlflow.ActiveRun):
         else:
             assert False
 
+    results = []
     for split_id, (train_idx, test_idx) in enumerate(sss.split(df, y)):
         # single shuffle -> nested subsets
         rng = np.random.RandomState(split_id)
@@ -126,9 +127,6 @@ def run_experiment(cfg: DictConfig, run: mlflow.ActiveRun):
 
             for model_name, model in models.items():
                 clf = clone(model)
-#                print(X_sub_matrix.shape)
-#                print(type(X_sub_matrix))
-#                print(X_sub_matrix)
                 clf.fit(X_sub_matrix, y_sub)
                 preds = clf.predict(X_test_matrix)
                 predict_proba = clf.predict_proba(X_test_matrix)
@@ -136,23 +134,24 @@ def run_experiment(cfg: DictConfig, run: mlflow.ActiveRun):
                 kappa = cohen_kappa_score(y_test, preds, weights="linear", labels=[0, 1, 2])
 
                 res = {
-                    f"{cfg.llm.name}_{model_name}_split": split_id,
-#                    "llm": cfg.llm.name,
-#                    "model": model_name,
-                    f"{cfg.llm.name}_{model_name}_train_frac": frac,
-                    f"{cfg.llm.name}_{model_name}_n_train": n_samples,
-                    f"{cfg.llm.name}_{model_name}_p": p,
-                    f"{cfg.llm.name}_{model_name}_r": r,
-                    f"{cfg.llm.name}_{model_name}_f1": f1,
-                    f"{cfg.llm.name}_{model_name}_kappa": kappa
+                    "split": split_id,
+                    "llm": cfg.llm.name,
+                    "model": model_name,
+                    "train_frac": frac,
+                    "n_train": n_samples,
+                    "p": p,
+                    "r": r,
+                    "f1": f1,
+                    "kappa": kappa,
+                    "y_test": y_test.replace({0: "NFS", 1: "UFS", 2: "CFS"}),
+                    "pred": pd.Series([to_cat_labels(p) for p in preds]),
+                    "predict_proba": predict_proba
                 }
-#                    "y_test": y_test.replace({0: "NFS", 1: "UFS", 2: "CFS"}),
-#                    "pred": pd.Series([to_cat_labels(p) for p in preds]),
-#                    "predict_proba": predict_proba
-#                }
-                #mlflow.log_param("llm_name", cfg.llm.name)
-                #mlflow.log_param("model_name", model_name)
-                mlflow.log_metrics(res)
+                results.append(res)
+
+    df_results = pd.DataFrame(results)
+    df_results.to_csv(cfg.experiment.path_results, index=False)
+    mlflow.log_artifact(cfg.experiment.path_results)
 
 
 @hydra.main(config_path="conf", config_name="config", version_base=None)
