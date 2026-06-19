@@ -58,7 +58,8 @@ def run_experiment(cfg: DictConfig, run: mlflow.ActiveRun):
         runner="pooling"
     )
 
-    embeds = llm.embed(df["claim"].to_list())
+    outputs = llm.embed(df["claim"].to_list())
+    embeds = [o.outputs.embedding for o in outputs]
     df["embed"] = embeds
 
     sss = StratifiedShuffleSplit(
@@ -111,6 +112,7 @@ def run_experiment(cfg: DictConfig, run: mlflow.ActiveRun):
         X_pool = X.iloc[train_idx] 
         y_pool = y.iloc[train_idx]
         X_test = X.iloc[test_idx]
+        X_test_matrix = np.vstack(X_test.values)
 
         X_pool = X_pool.iloc[order].reset_index(drop=True)
         y_pool = y_pool.iloc[order].reset_index(drop=True)
@@ -119,30 +121,37 @@ def run_experiment(cfg: DictConfig, run: mlflow.ActiveRun):
             n_samples = int(frac * N)
 
             X_sub = X_pool.iloc[:n_samples]
+            X_sub_matrix = np.vstack(X_sub.values)
             y_sub = y_pool.iloc[:n_samples]
 
             for model_name, model in models.items():
                 clf = clone(model)
-                clf.fit(X_sub, y_sub)
-                preds = clf.predict(X_test)
-                predict_proba = clf.predict_proba(X_test)
+#                print(X_sub_matrix.shape)
+#                print(type(X_sub_matrix))
+#                print(X_sub_matrix)
+                clf.fit(X_sub_matrix, y_sub)
+                preds = clf.predict(X_test_matrix)
+                predict_proba = clf.predict_proba(X_test_matrix)
                 p, r, f1, _ = precision_recall_fscore_support(y_test, preds, average="macro")
                 kappa = cohen_kappa_score(y_test, preds, weights="linear", labels=[0, 1, 2])
 
                 res = {
-                    "split": split_id,
-                    "llm": cfg.llm.name,
-                    "model": model_name,
-                    "train_frac": frac,
-                    "n_train": n_samples,
-                    "p": p,
-                    "r": r,
-                    "f1": f1,
-                    "kappa": kappa,
-                    "y_test": y_test.replace({0: "NFS", 1: "UFS", 2: "CFS"}),
-                    "pred": pd.Series([to_cat_labels(p) for p in preds]),
-                    "predict_proba": predict_proba
+                    f"{cfg.llm.name}_{model_name}_split": split_id,
+#                    "llm": cfg.llm.name,
+#                    "model": model_name,
+                    f"{cfg.llm.name}_{model_name}_train_frac": frac,
+                    f"{cfg.llm.name}_{model_name}_n_train": n_samples,
+                    f"{cfg.llm.name}_{model_name}_p": p,
+                    f"{cfg.llm.name}_{model_name}_r": r,
+                    f"{cfg.llm.name}_{model_name}_f1": f1,
+                    f"{cfg.llm.name}_{model_name}_kappa": kappa
                 }
+#                    "y_test": y_test.replace({0: "NFS", 1: "UFS", 2: "CFS"}),
+#                    "pred": pd.Series([to_cat_labels(p) for p in preds]),
+#                    "predict_proba": predict_proba
+#                }
+                #mlflow.log_param("llm_name", cfg.llm.name)
+                #mlflow.log_param("model_name", model_name)
                 mlflow.log_metrics(res)
 
 

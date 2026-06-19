@@ -10,7 +10,7 @@ set -euo pipefail
 # Checks that the user passed three argument (the task script file,
 # the experiment config file, and the LLM config file).
 # Otherwise, prints usage and exits.
-if [ $# -lt 3 ]; then
+if [ $# -lt 2 ]; then
   echo "Usage: $0 <experiment_config.yaml> <llm_config.yaml>"
   exit 1
 fi
@@ -25,9 +25,8 @@ fi
 
 ENV_NAME="wsf_arg_plus_env"
 
-TASK_SCRIPT=$1
-EXPERIMENT_CONFIG=$2
-LLM_CONFIG=$3
+EXPERIMENT_CONFIG=$1
+LLM_CONFIG=$2
 
 # Takes config file
 # Small inline Python helper to extract YAML values
@@ -68,10 +67,10 @@ cat <<EOF > "$SBATCH_SCRIPT"
 #SBATCH --error=./slurmerr/${JOB_NAME}.err
 
 source ../${ENV_NAME}/bin/activate
-python ${TASK_SCRIPT} \\
+python embed_then_predict.py \\
     llm=${LLM_NAME} \\
     experiment=${EXPERIMENT_NAME} \\
-    input.run_name=${JOB_NAME}
+    input.run_name=${JOB_NAME} \\
     input.data_path=../data/wsf_arg_plus_per_claim.csv
 EOF
 
