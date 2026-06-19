@@ -98,12 +98,12 @@ def run_experiment(cfg: DictConfig, run: mlflow.ActiveRun):
         else:
             assert False
 
-    large_flatten = [f"{model_name}_{shot}_claim_cw" for model_name, shots in large.items() for shot in shots]
     large = {
 	    "Llama-70B": ["zero", "one"],
 	    "Qwen2.5-72B": ["zero", "one"],
 	    "Command-r-104B": ["zero", "one"],
     }
+    large_flatten = [f"{model_name}_{shot}_claim_cw" for model_name, shots in large.items() for shot in shots]
 
     results = []
     for split_id, (train_idx, test_idx) in enumerate(sss.split(df, y)):
