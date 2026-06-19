@@ -71,7 +71,7 @@ python embed_then_predict.py \\
     llm=${LLM_NAME} \\
     experiment=${EXPERIMENT_NAME} \\
     input.run_name=${JOB_NAME} \\
-    input.data_path=../data/wsf_arg_plus_per_claim.csv
+    input.data_path=../data/wsf_arg_plus_per_claim_all_llms.csv
 EOF
 
 # If Slurm is not available, just print the job script
