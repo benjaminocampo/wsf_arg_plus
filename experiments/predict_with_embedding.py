@@ -49,15 +49,7 @@ def run_experiment(cfg: DictConfig, run: mlflow.ActiveRun):
 
     df = df.head(int(len(df) * cfg.input.data_size))
 
-    llm = LLM(
-        model=cfg.llm.params.model,
-        tensor_parallel_size=cfg.llm.params.tensor_parallel_size,
-        dtype=cfg.llm.params.dtype,
-        runner="pooling"
-    )
-
-    outputs = llm.embed(df["claim"].to_list())
-    embeds = [o.outputs.embedding for o in outputs]
+    embeds = np.load(f"../data/llm_embeddings/{cfg.llm.name}_get_embedding.npy")
     df["embed"] = embeds
 
     sss = StratifiedShuffleSplit(
@@ -71,20 +63,20 @@ def run_experiment(cfg: DictConfig, run: mlflow.ActiveRun):
     N = len(df)
 
     models = {
-            "lgr": LogisticRegression(max_iter=1000, random_state=0),
-            "rforest": RandomForestClassifier(random_state=0),
-            "svm": SVC(probability=True, random_state=0),
-            "mlp": MLPClassifier(
-                hidden_layer_sizes=(100,),
-                max_iter=1000,
-                random_state=0
-            ),
-            "xgb": XGBClassifier(
-                use_label_encoder=False,
-                eval_metric="logloss",
-                random_state=0
-            ),
-        }
+        "lgr": LogisticRegression(max_iter=1000, random_state=0),
+        "rforest": RandomForestClassifier(random_state=0),
+        "svm": SVC(probability=True, random_state=0),
+        "mlp": MLPClassifier(
+            hidden_layer_sizes=(100,),
+            max_iter=1000,
+            random_state=0
+        ),
+        "xgb": XGBClassifier(
+            use_label_encoder=False,
+            eval_metric="logloss",
+            random_state=0
+        ),
+    }
 
     y = df["claim_cw_platinum"].replace({"NFS": 0, "UFS": 1, "CFS": 2})
 
