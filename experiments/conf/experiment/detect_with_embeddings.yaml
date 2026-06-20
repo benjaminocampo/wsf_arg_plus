@@ -1,3 +1,3 @@
-experiment_name: claim_embeddings
+experiment_name: detect_with_embeddings
 experiment_description: "LLMs are embedding the claims of WSF-ARG+ and then used to predict on platinum check-worthiness labels."
 path_results: ../data/embed_results
