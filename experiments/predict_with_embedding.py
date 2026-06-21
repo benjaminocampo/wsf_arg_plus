@@ -90,12 +90,88 @@ def run_experiment(cfg: DictConfig, run: mlflow.ActiveRun):
         else:
             assert False
 
-    large = {
+    all = {
+	    "Mistral-7B": ["zero","one"],
+	    "Llama-8B": ["zero", "one"],
+	    "Olmo2-7B": ["zero", "one"],
+	    "Qwen2.5-7B": ["zero", "one"],
+	    "Command-r-7B": ["zero", "one"],
+	    "Mixtral-8x7B": ["zero", "one"],
+	    "Mistral-22B": ["zero", "one"],
+	    "Olmo2-32B": ["zero", "one"],
+	    "Mixtral-8x22B": ["zero", "one"],
 	    "Llama-70B": ["zero", "one"],
 	    "Qwen2.5-72B": ["zero", "one"],
 	    "Command-r-104B": ["zero", "one"],
     }
+    small = {
+    	"Mistral-7B": ["zero","one"],
+    	"Llama-8B": ["zero", "one"],
+    	"Olmo2-7B": ["zero", "one"],
+    	"Qwen2.5-7B": ["zero", "one"],
+    	"Command-r-7B": ["zero", "one"]
+    }
+    medium = {
+    	"Mixtral-8x7B": ["zero", "one"],
+    	"Mistral-22B": ["zero", "one"],
+    	"Olmo2-32B": ["zero", "one"],
+    	"Mixtral-8x22B": ["zero", "one"],
+
+    }
+    large = {
+    	"Llama-70B": ["zero", "one"],
+    	"Qwen2.5-72B": ["zero", "one"],
+    	"Command-r-104B": ["zero", "one"],
+    }
+
+    mistral = {
+    	"Mistral-7B": ["zero","one"],
+    	"Mistral-22B": ["zero", "one"],
+    }
+    mixtral = {
+    	"Mixtral-8x22B": ["zero", "one"],
+    	"Mixtral-8x7B": ["zero", "one"],
+    }
+    llama = {
+        "Llama-8B": ["zero", "one"],
+    	"Llama-70B": ["zero", "one"],
+    }
+    olmo = {
+        "Olmo2-7B": ["zero", "one"],
+    	"Olmo2-32B": ["zero", "one"],
+    }
+    qwen = {
+        "Qwen2.5-7B": ["zero", "one"],
+    	"Qwen2.5-72B": ["zero", "one"],
+    }
+    commandr = {
+        "Command-r-7B": ["zero", "one"],
+        "Command-r-104B": ["zero", "one"],
+    }
+
+    all_flatten = [f"{model_name}_{shot}_claim_cw" for model_name, shots in all.items() for shot in shots]
+    small_flatten = [f"{model_name}_{shot}_claim_cw" for model_name, shots in small.items() for shot in shots]
+    medium_flatten = [f"{model_name}_{shot}_claim_cw" for model_name, shots in medium.items() for shot in shots]
     large_flatten = [f"{model_name}_{shot}_claim_cw" for model_name, shots in large.items() for shot in shots]
+    mistral_flatten = [f"{model_name}_{shot}_claim_cw" for model_name, shots in mistral.items() for shot in shots]
+    mixtral_flatten = [f"{model_name}_{shot}_claim_cw" for model_name, shots in mixtral.items() for shot in shots]
+    llama_flatten = [f"{model_name}_{shot}_claim_cw" for model_name, shots in llama.items() for shot in shots]
+    olmo_flatten = [f"{model_name}_{shot}_claim_cw" for model_name, shots in olmo.items() for shot in shots]
+    qwen_flatten = [f"{model_name}_{shot}_claim_cw" for model_name, shots in qwen.items() for shot in shots]
+    commandr_flatten = [f"{model_name}_{shot}_claim_cw" for model_name, shots in commandr.items() for shot in shots]
+
+    mv_strats = {
+        "all": all_flatten,
+        "small": small_flatten,
+        "medium": medium_flatten,
+        "large": large_flatten,
+        "mistral": mistral_flatten,
+        "mixtral": mixtral_flatten,
+        "llama": llama_flatten,
+        "olmo": olmo_flatten,
+        "qwen": qwen_flatten,
+        "commandr": commandr_flatten,
+    }
 
     results = []
     for split_id, (train_idx, test_idx) in enumerate(sss.split(df, y)):
@@ -107,70 +183,75 @@ def run_experiment(cfg: DictConfig, run: mlflow.ActiveRun):
         y_test = y.iloc[test_idx]
         X_embed = df["embed"]
 
-        for ann in ["base", "only_llms", "annA", "annB", "annC"]:
+        for mv_strat, flatten in mv_strats.items():
+            for ann in ["base", "only_llms", "annA", "annB", "annC"]:
 
-            if ann == "base":
-                # No llm predictions, no annotations from humans, concat with empty
-                X_llm_preds = pd.DataFrame(index=range(len(df)))
-            elif ann == "only_llms":
-                # Encode of only llms
-                X_llm_preds = pd.get_dummies(df[large_flatten]).astype(int)
-            else:
-                # Encode of llms + annotators
-                X_llm_preds = pd.get_dummies(df[large_flatten + [f"claim_cw_{ann}_platinum"]]).astype(int)
+                if ann == "base":
+                    # No llm predictions, no annotations from humans, concat with empty
+                    X_llm_preds = pd.DataFrame(index=range(len(df)))
+                elif ann == "only_llms":
+                    # Encode of only llms
+                    X_llm_preds = pd.get_dummies(df[flatten]).astype(int)
+                else:
+                    # Encode of llms + annotators
+                    X_llm_preds = pd.get_dummies(df[flatten + [f"claim_cw_{ann}_platinum"]]).astype(int)
 
-            X_pool_embed = X_embed.iloc[train_idx]
-            X_pool_llm_preds = X_llm_preds.iloc[train_idx]
+                X_pool_embed = X_embed.iloc[train_idx]
+                X_pool_llm_preds = X_llm_preds.iloc[train_idx]
 
-            X_test_embed = X_embed.iloc[test_idx]
-            X_test_llm_preds = X_llm_preds.iloc[test_idx]
-            X_test_embed_matrix = np.vstack(X_test_embed.values)
-            X_test_matrix = np.hstack((X_test_embed_matrix, X_test_llm_preds))
+                X_test_embed = X_embed.iloc[test_idx]
+                X_test_llm_preds = X_llm_preds.iloc[test_idx]
+                X_test_embed_matrix = np.vstack(X_test_embed.values)
+                X_test_matrix = np.hstack((X_test_embed_matrix, X_test_llm_preds))
 
-            y_pool = y.iloc[train_idx]
+                y_pool = y.iloc[train_idx]
 
-            X_pool_embed = X_pool_embed.iloc[order].reset_index(drop=True)
-            X_pool_llm_preds = X_pool_llm_preds.iloc[order].reset_index(drop=True)
-            y_pool = y_pool.iloc[order].reset_index(drop=True)
+                X_pool_embed = X_pool_embed.iloc[order].reset_index(drop=True)
+                X_pool_llm_preds = X_pool_llm_preds.iloc[order].reset_index(drop=True)
+                y_pool = y_pool.iloc[order].reset_index(drop=True)
 
-            for frac in fractions[1:]:
-                n_samples = int(frac * N)
+                for frac in fractions[1:]:
+                    n_samples = int(frac * N)
 
-                X_sub_embed = X_pool_embed.iloc[:n_samples]
-                X_sub_llm_preds = X_pool_llm_preds.iloc[:n_samples]
-                X_sub_embed_matrix = np.vstack(X_sub_embed.values)
-                X_sub_matrix = np.hstack((X_sub_embed_matrix, X_sub_llm_preds))
+                    X_sub_embed = X_pool_embed.iloc[:n_samples]
+                    X_sub_llm_preds = X_pool_llm_preds.iloc[:n_samples]
+                    X_sub_embed_matrix = np.vstack(X_sub_embed.values)
+                    X_sub_matrix = np.hstack((X_sub_embed_matrix, X_sub_llm_preds))
 
-                y_sub = y_pool.iloc[:n_samples]
+                    y_sub = y_pool.iloc[:n_samples]
 
-                for model_name, model in models.items():
-                    clf = clone(model)
-                    clf.fit(X_sub_matrix, y_sub)
-                    preds = clf.predict(X_test_matrix)
-                    predict_proba = clf.predict_proba(X_test_matrix)
-                    p, r, f1, _ = precision_recall_fscore_support(y_test, preds, average="macro")
-                    kappa = cohen_kappa_score(y_test, preds, weights="linear", labels=[0, 1, 2])
+                    for model_name, model in models.items():
+                        clf = clone(model)
+                        clf.fit(X_sub_matrix, y_sub)
+                        preds = clf.predict(X_test_matrix)
+                        predict_proba = clf.predict_proba(X_test_matrix)
+                        p, r, f1, _ = precision_recall_fscore_support(y_test, preds, average="macro")
+                        kappa = cohen_kappa_score(y_test, preds, weights="linear", labels=[0, 1, 2])
 
-                    res = {
-                        "split": split_id,
-                        "llm": cfg.llm.name,
-                        "model": model_name,
-                        "ann": ann,
-                        "train_frac": frac,
-                        "n_train": n_samples,
-                        "p": p,
-                        "r": r,
-                        "f1": f1,
-                        "kappa": kappa,
-                        "y_test": y_test.replace({0: "NFS", 1: "UFS", 2: "CFS"}),
-                        "pred": pd.Series([to_cat_labels(p) for p in preds]),
-                        "predict_proba": predict_proba
-                    }
-                    results.append(res)
+                        res = {
+                            "split": split_id,
+                            "llm": cfg.llm.name,
+                            "model": model_name,
+                            "ann": ann,
+                            "llm_group": mv_strat,
+                            "train_frac": frac,
+                            "n_train": n_samples,
+                            "p": p,
+                            "r": r,
+                            "f1": f1,
+                            "kappa": kappa,
+                            "y_test": y_test.replace({0: "NFS", 1: "UFS", 2: "CFS"}),
+                            "pred": pd.Series([to_cat_labels(p) for p in preds]),
+                            "annA": df.iloc[test_idx]["claim_cw_annA_platinum"],
+                            "annB": df.iloc[test_idx]["claim_cw_annB_platinum"],
+                            "annC": df.iloc[test_idx]["claim_cw_annC_platinum"],
+                            "predict_proba": predict_proba
+                        }                    
+                        results.append(res)
 
-        df_results = pd.DataFrame(results)
-        df_results.to_csv(f"{cfg.experiment.path_results}/{cfg.input.run_name}.csv", index=False)
-        mlflow.log_artifact(f"{cfg.experiment.path_results}/{cfg.input.run_name}.csv")
+    df_results = pd.DataFrame(results)
+    df_results.to_pickle(f"{cfg.experiment.path_results}/{cfg.input.run_name}.pkl")
+    mlflow.log_artifact(f"{cfg.experiment.path_results}/{cfg.input.run_name}.pkl")
 
 
 @hydra.main(config_path="conf", config_name="config", version_base=None)

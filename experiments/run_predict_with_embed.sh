@@ -59,7 +59,7 @@ SBATCH_SCRIPT=$(mktemp)
 cat <<EOF > "$SBATCH_SCRIPT"
 #!/bin/bash
 #SBATCH --job-name=${JOB_NAME}
-#SBATCH --time=05:00:00
+#SBATCH --time=30:00:00
 #SBATCH --partition=rome
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=150G
