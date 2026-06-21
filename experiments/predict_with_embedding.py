@@ -50,7 +50,7 @@ def run_experiment(cfg: DictConfig, run: mlflow.ActiveRun):
     df = df.head(int(len(df) * cfg.input.data_size))
 
     embeds = np.load(f"../data/llm_embeddings/{cfg.llm.name}_get_embedding.npy")
-    df["embed"] = embeds
+    df["embed"] = embeds.tolist()
 
     sss = StratifiedShuffleSplit(
         n_splits=5,
