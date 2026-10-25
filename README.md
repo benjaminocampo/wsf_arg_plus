@@ -253,6 +253,7 @@ More specifically, Step 3 is implemented in the files `02_cw_percent_agreement.p
 
 You can use the following bibtex:
 
+```
 @inproceedings{ocampo-etal-2026-hate,
     title = "When Hate Meets Facts: {LLM}s-in-the-Loop for Check-worthiness Detection in Hate Speech",
     author = "Ocampo, Nicol{\'a}s Benjam{\'i}n  and
@@ -272,3 +273,4 @@ You can use the following bibtex:
     ISBN = "979-8-89176-459-0",
     abstract = "Hateful content online is often expressed using fact-like, not necessarily correct information, especially in coordinated online harassment campaigns and extremist propaganda. Failing to jointly address hate speech (HS) and misinformation can deepen prejudice, reinforce harmful stereotypes, and expose bystanders to psychological distress, while polluting public debate. Moreover, these messages require more effort from content moderators because they must assess both harmfulness and veracity, i.e., fact-check them. To address this challenge, we release WSF-ARG+, the first dataset which combines hate speech with check-worthiness information. We also introduce a novel LLM-in-the-loop framework to facilitate the annotation of check-worthy claims. We run our framework, testing it with 12 open-weight LLMs of different sizes and architectures. We validate it through extensive human evaluation, and show that our LLM-in-the-loop framework reduces human effort without compromising the annotation quality of the data. Finally, we show that HS messages with check-worthy claims show significantly higher harassment and hate, and that incorporating check-worthiness labels improves LLM-based HS detection up to 0.213 macro-F1 and to 0.154 macro-F1 on average for large models."
 }
+```
