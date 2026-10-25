@@ -29,6 +29,7 @@ datasets.
 - [Results and logging](#results-and-logging)
 - [WSF-ARG+ Dataset](#wsf-arg-dataset)
 - [How-To Guidelines for Running LLM-in-the-Loop](#how-to-guidelines-for-running-llm-in-the-loop)
+- [Cite Us](#cite-us)
 
 ## Installation
 
@@ -247,3 +248,27 @@ Finally, if available, the LLM-in-the-loop labels should be compared with those 
 As anticipated in the previous sections of this README, `predict_cw.py` is a use case example of Step 2, defining a script for running several configurations and generating annotations with LLMs. The analysis carried out in Steps 3, 4, 5, and 6 can be found in the directory `experiments/analysis/`, where we provide python percent files (similar to notebooks) in which we performed each of the remaining steps.
 
 More specifically, Step 3 is implemented in the files `02_cw_percent_agreement.py`, `03_iaa_olmo2-32B_vs_rest.py`, and `B_pred_variability.py`. Step 4 is carried out by analyzing the results of Step 3. The analysis for Step 5 can be found in `03.1_judge_decisions.py`. Finally, Step 6 is implemented in `04_data_distribution.py` and `A_iaa_full_human.py`
+
+## Cite Us
+
+You can use the following bibtex:
+
+@inproceedings{ocampo-etal-2026-hate,
+    title = "When Hate Meets Facts: {LLM}s-in-the-Loop for Check-worthiness Detection in Hate Speech",
+    author = "Ocampo, Nicol{\'a}s Benjam{\'i}n  and
+      Caselli, Tommaso  and
+      Ceolin, Davide",
+    editor = "Lee, Hung-Yi  and
+      Dev, Sunipa  and
+      Li, Jessy  and
+      Elliott, Desmond",
+    booktitle = "Proceedings of the 2026 Conference on Empirical Methods in Natural Language Processing",
+    month = oct,
+    year = "2026",
+    address = "Budapest, Hungary",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2026.emnlp-main.146/",
+    pages = "3380--3397",
+    ISBN = "979-8-89176-459-0",
+    abstract = "Hateful content online is often expressed using fact-like, not necessarily correct information, especially in coordinated online harassment campaigns and extremist propaganda. Failing to jointly address hate speech (HS) and misinformation can deepen prejudice, reinforce harmful stereotypes, and expose bystanders to psychological distress, while polluting public debate. Moreover, these messages require more effort from content moderators because they must assess both harmfulness and veracity, i.e., fact-check them. To address this challenge, we release WSF-ARG+, the first dataset which combines hate speech with check-worthiness information. We also introduce a novel LLM-in-the-loop framework to facilitate the annotation of check-worthy claims. We run our framework, testing it with 12 open-weight LLMs of different sizes and architectures. We validate it through extensive human evaluation, and show that our LLM-in-the-loop framework reduces human effort without compromising the annotation quality of the data. Finally, we show that HS messages with check-worthy claims show significantly higher harassment and hate, and that incorporating check-worthiness labels improves LLM-based HS detection up to 0.213 macro-F1 and to 0.154 macro-F1 on average for large models."
+}
